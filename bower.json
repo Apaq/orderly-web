@@ -1,0 +1,27 @@
+{
+  "name": "orderly-web",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Apaq/orderly-web",
+  "authors": [
+    "Michael Krog <mic@apaq.dk>"
+  ],
+  "description": "A Web client for Orderly",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "orderly-angular": "*",
+    "angular-bootstrap": "~0.11.0",
+    "angular-route": "~1.2.21",
+    "angular-ui-calendar": "~0.8.1"
+  },
+  "resolutions": {
+    "jquery": "~1.10.2"
+  }
+}

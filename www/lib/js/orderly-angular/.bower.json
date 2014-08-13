@@ -1,0 +1,36 @@
+{
+  "name": "orderly-angular",
+  "version": "0.0.5",
+  "homepage": "https://github.com/Apaq/orderly-angular",
+  "authors": [
+    "Michael Krog <mic@apaq.dk>"
+  ],
+  "description": "An Orderly client lib for Angular",
+  "main": "src/ng-orderly.js",
+  "keywords": [
+    "orderly",
+    "angular"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.2.21",
+    "angular-resource": "~1.2.21",
+    "angular-local-storage": "~0.0.5"
+  },
+  "_release": "0.0.5",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.0.5",
+    "commit": "70bc0bb7308efa5b316444c546c6bdf58751c8b3"
+  },
+  "_source": "git://github.com/Apaq/orderly-angular.git",
+  "_target": "*",
+  "_originalSource": "orderly-angular"
+}

@@ -1,0 +1,25 @@
+body {
+    padding-top: 45px;
+}
+
+.fc-header {
+    display:none;
+}
+
+.no-padding {
+    padding: 0 !important;
+}
+
+.padding-left {
+    padding-left: 15px !important;
+}
+
+.padding-right {
+    padding-right: 15px !important;
+}
+
+.fc-event.selected {
+    border: 1px solid #0079a1; /* default BORDER color */
+	background-color: #008cba; /* default BACKGROUND color */
+	color: white;
+}
