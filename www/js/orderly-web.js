@@ -59,7 +59,7 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     }
     
     $scope.persons = PersonSvc.query({
-        domain: $scope.selectedRelation.domain.id
+        domain: $scope.context.selectedRelation.domain.id
     });
     
     $scope.edit.time = new Date($scope.event.startTime.getTime());
@@ -221,7 +221,7 @@ function CalendarController($scope, EventSvc, $log, $location, $routeParams, $fi
 
         var type = 'FieldServiceMeeting';
         var event = angular.copy($scope.eventTemplates[type]);
-        event.domain.id = $scope.selectedRelation.domain.id;
+        event.domain.id = $scope.context.selectedRelation.domain.id;
         event.startTime = startTime;
         //event.endTime = endTime;
         
@@ -329,14 +329,17 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
             }
         };
         
+        $rootScope.context = {};
+        
         
         $rootScope.$on("login", function (event, user) {
-            $rootScope.relations = PersonSvc.relations({
+            $rootScope.context.user = user;
+            $rootScope.context.relations = PersonSvc.relations({
                 id: 'current'
             });
-            $rootScope.relations.$promise.then(function () {
-                if ($rootScope.relations.length > 0) {
-                    $rootScope.selectedRelation = $rootScope.relations[0];
+            $rootScope.context.relations.$promise.then(function () {
+                if ($rootScope.context.relations.length > 0) {
+                    $rootScope.context.relation = $rootScope.context.relations[0];
                 } else {
                     alert('Ingen relation');
                 }
