@@ -1,0 +1,48 @@
+<div class="modal-header">
+    <div class="row">
+        <div class="col-sm-6">
+            <h3 class="modal-title">{{eventTypes[event.type]}}</h3>
+        </div>
+        <div class="col-sm-6">
+
+            <div class="form-inline">
+                <div class="form-group pull-right">
+                    <label class="control-label" for="inputSuccess4">Starttidspunkt:</label>
+                    <input type="time" class="form-control input-sm" ng-model="edit.time">
+                </div>
+
+            </div>
+            <!--timepicker ng-model="event.startTime" show-meridian="false"></timepicker-->
+        </div>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="row" ng-if="selectedTask !== null">
+        <div class="col-sm-4">
+            <ul class="nav nav-pills nav-stacked" style="max-width: 300px;">
+                <li ng-repeat="task in selectedAgenda.tasks" ng-class="{active:selectedTask.id===task.id}">
+                    <a ng-click="alert('select')">{{taskTypes[task.type]}}<span class="badge pull-right" ng-click="alert('slet')">Slet</span></a>
+
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-8 well">
+            <field-service-meeting ng-if="selectedTask.type==='FieldServiceMeeting'" task="selectedTask" persons="persons"></field-service-meeting>
+        </div>
+    </div>
+
+    <div class="row" ng-if="selectedTask === null">
+        <h2 class="text-center">Ingen opgaver i begivenheden</h2>
+        <h6 class="taxt-center"><a>Opret opgave <i class="glyphicon glyphicon-plus"></i></a></h6>
+    </div>
+
+
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+
+    <button class="btn btn-danger" ng-click="delete()">Slet</button>
+</div>
+

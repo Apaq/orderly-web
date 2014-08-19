@@ -10,6 +10,9 @@ body {
     padding: 0 !important;
 }
 
+.no-margin {
+    margin: 0 !important;
+}
 .padding-left {
     padding-left: 15px !important;
 }

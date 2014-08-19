@@ -54,7 +54,14 @@ function Config($httpProvider, orderlyProvider) {
 }
 
 function PersonSvc($resource, orderly) {
-    return $resource(orderly.getServiceUrl() + 'persons/:id');
+    return $resource(orderly.getServiceUrl() + 'persons/:id', null,
+       {
+           'relations': { 
+               method:'GET',
+               url: orderly.getServiceUrl() + 'persons/:id/relations',
+               isArray: true
+           }
+       });
 }
 
 function AssignmentSvc($resource, orderly) {

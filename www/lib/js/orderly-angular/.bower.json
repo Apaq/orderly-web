@@ -1,6 +1,6 @@
 {
   "name": "orderly-angular",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "homepage": "https://github.com/Apaq/orderly-angular",
   "authors": [
     "Michael Krog <mic@apaq.dk>"
@@ -24,11 +24,11 @@
     "angular-resource": "~1.2.21",
     "angular-local-storage": "~0.0.5"
   },
-  "_release": "0.0.5",
+  "_release": "0.0.6",
   "_resolution": {
     "type": "version",
-    "tag": "0.0.5",
-    "commit": "70bc0bb7308efa5b316444c546c6bdf58751c8b3"
+    "tag": "0.0.6",
+    "commit": "1026e53ca5946acf608c493b348615753f7b9052"
   },
   "_source": "git://github.com/Apaq/orderly-angular.git",
   "_target": "*",
