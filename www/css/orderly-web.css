@@ -6,6 +6,17 @@ body {
     display:none;
 }
 
+.container-fluid > .row.no-padding {
+    margin-left:-30px !important;
+    margin-right:-15px !important;
+    padding: 0px !important;
+}
+
+.container-fluid > .row.no-padding > *[class*=col-] {
+    padding-right:0px;
+}
+
+
 .no-padding {
     padding: 0 !important;
 }

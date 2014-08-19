@@ -81,11 +81,11 @@ function DomainSvc($resource, orderly) {
 }
 
 function RelationSvc($resource, orderly) {
-    return $resource(orderly.getServiceUrl() + 'persons/current/relations');
+    return $resource(orderly.getServiceUrl() + 'domains/:id/relations');
 }
 
 function LoginSvc($q, localStorageService, $http, $rootScope, orderly, $log) {
-    'use strict'
+    'use strict';
     var currentUser = null;
     return {
         authenticate: function (username, password, remember) {
@@ -128,7 +128,7 @@ function LoginSvc($q, localStorageService, $http, $rootScope, orderly, $log) {
                     user = response.data;
 
                     $log.info('Authenticated. Returning user.');
-                    $http.defaults.headers.common['Authorization'] = authHeader;
+                    $http.defaults.headers.common.Authorization = authHeader;
 
                     $log.info('Logged in as ' + user.username);
                     currentUser = user;
@@ -146,14 +146,14 @@ function LoginSvc($q, localStorageService, $http, $rootScope, orderly, $log) {
             return currentUser;
         },
         deauthenticate: function () {
-            $http.defaults.headers.common['Authorization'] = undefined;
+            $http.defaults.headers.common.Authorization = undefined;
             localStorageService.remove('LoginToken');
             $rootScope.$broadcast("logout", currentUser);
             currentUser = null;
             $rootScope.currentUser = null;
         }
-    }
-};
+    };
+}
 
 
 angular.module('orderly.services', ['ngResource', 'LocalStorageModule'])
@@ -164,5 +164,6 @@ angular.module('orderly.services', ['ngResource', 'LocalStorageModule'])
         'AssignmentSvc': AssignmentSvc,
         'EventSvc': EventSvc,
         'LoginSvc': LoginSvc,
-        'RelationSvc': RelationSvc
+        'RelationSvc': RelationSvc,
+        'DomainSvc': DomainSvc
     });

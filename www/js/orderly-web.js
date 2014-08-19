@@ -22,6 +22,10 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             templateUrl: 'views/event.html',
             controller: 'EventController'
         })
+        .when('/persons', {
+            templateUrl: 'views/persons.html',
+            controller: 'PersonListController'
+        })
         .when('/login', {
             templateUrl: 'views/login.html',
             controller: 'LoginController'
@@ -32,6 +36,9 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 
 }
 
+function MenuController($scope) {
+}
+
 function LoginController($scope, LoginSvc, $location, $filter) {
     $scope.login = function () {
         LoginSvc.authenticate($scope.user, $scope.pass).then(function () {
@@ -40,6 +47,64 @@ function LoginController($scope, LoginSvc, $location, $filter) {
         });
     };
 }
+
+function PersonListController($scope, PersonSvc, RelationSvc, $modal, $log) {
+    
+    $scope._load = function() {
+        $scope.relations = RelationSvc.query({id:$scope.context.relation.domain.id});
+    };
+    
+    $scope.edit = function(person) {
+        $scope._open(angular.copy(person));
+    };
+    
+    $scope._open = function (person) {
+
+        var modalInstance = $modal.open({
+            templateUrl: 'views/person.html',
+            controller: PersonController,
+            size: 'md',
+            resolve: {
+                person: function () {
+                    return person;
+                }
+            }
+        });
+
+        modalInstance.result.then(function (event) {
+            PersonSvc.save({id:event.id}, event).$promise.then($scope._load);
+            
+        }, function (reason) {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+    
+    $scope._load();
+}
+
+function PersonController($scope, $log, person, PersonSvc, $modalInstance) {
+    $scope.person = person;
+    
+    
+    $scope.ok = function () {
+        $modalInstance.close($scope.person);
+    };
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+
+    $scope.delete = function () {
+        if (confirm("Delete?")) {
+            PersonSvc.remove({
+                id: $scope.person.id
+            }).$promise.then(function () {
+                $modalInstance.dismiss('deleted');
+            });
+        }
+    };
+}
+
 
 function EventController($scope, EventSvc, $log, $location, event, $window, PersonSvc, $modalInstance) {
     $scope.event = event;
@@ -59,7 +124,7 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     }
     
     $scope.persons = PersonSvc.query({
-        domain: $scope.context.selectedRelation.domain.id
+        domain: $scope.context.relation.domain.id
     });
     
     $scope.edit.time = new Date($scope.event.startTime.getTime());
@@ -221,7 +286,7 @@ function CalendarController($scope, EventSvc, $log, $location, $routeParams, $fi
 
         var type = 'FieldServiceMeeting';
         var event = angular.copy($scope.eventTemplates[type]);
-        event.domain.id = $scope.context.selectedRelation.domain.id;
+        event.domain.id = $scope.context.relation.domain.id;
         event.startTime = startTime;
         //event.endTime = endTime;
         
@@ -295,6 +360,8 @@ function FieldServiceMeetingFormDirective() {
 angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui.bootstrap'])
     .config(AppConfig)
     .controller('LoginController', LoginController)
+    .controller('MenuController', MenuController)
+    .controller('PersonListController', PersonListController)
     .controller('CalendarController', CalendarController)
     .directive('fieldServiceMeeting', FieldServiceMeetingFormDirective)
     .run(function ($rootScope, $location, PersonSvc) {
