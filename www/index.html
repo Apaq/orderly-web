@@ -50,10 +50,16 @@
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div ng-if="context.user" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
+                <ul class="nav navbar-nav" ng-if="context.relation">
                     <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/calendar">Kalender</a></li>
                     <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons">Personer</a></li>
                     <li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')"><a href="#/settings">Indstillinger</a></li>
+                </ul>
+                
+                <ul class="nav navbar-nav" ng-if="context.adminMode">
+                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/admin/domains">Domæner</a></li>
+                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/admin/persons">Personer</a></li>
+                    <li ng-class="{active:currentArea() === 'settings'}"><a href="#/admin/settings">Indstillinger</a></li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
@@ -62,13 +68,14 @@
                         <ul class="dropdown-menu" role="menu">
                             <li ng-repeat="relation in context.relations"><a ng-click="selectDomain(relation)">{{relation.domain.name}}</a></li>
                             <li class="divider"></li>
-                            <li ng-if="context.user"><a href="#/admin">Admin</a></li>
+                            <li ng-if="context.user"><a ng-click="selectAdminMode()">Admin</a></li>
                             <li ng-if="context.user" class="divider"></li>
                             <li><a ng-click="logout()">Log ud</a></li>
                         </ul>
                     </li>
                 </ul>
             </div>
+
             <!-- /.navbar-collapse -->
         </div>
         <!-- /.container-fluid -->

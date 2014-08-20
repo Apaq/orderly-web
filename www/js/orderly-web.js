@@ -20,8 +20,8 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             controller: 'CalendarController'
         })
         .when('/persons', {
-            templateUrl: 'views/persons.html',
-            controller: 'PersonListController'
+            templateUrl: 'views/relations.html',
+            controller: 'RelationListController'
         })
         .when('/login', {
             templateUrl: 'views/login.html',
@@ -44,7 +44,14 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 function MenuController($scope, $location, LoginSvc) {
     $scope.selectDomain = function (relation) {
         $scope.context.relation = relation;
+        $scope.context.adminMode = false;
         $location.path('/calendar');
+    };
+
+    $scope.selectAdminMode = function () {
+        delete $scope.context.relation;
+        $scope.context.adminMode = true;
+        $location.path('/admin/domains');
     };
 
     $scope.currentArea = function () {
@@ -63,7 +70,7 @@ function MenuController($scope, $location, LoginSvc) {
     };
 }
 
-function LoginController($scope, LoginSvc, $location) {
+function LoginController($scope, LoginSvc, $location, $log) {
     $scope.login = function () {
         LoginSvc.authenticate($scope.user, $scope.pass).then(function () {
             $location.path('/calendar');
@@ -71,58 +78,146 @@ function LoginController($scope, LoginSvc, $location) {
     };
 }
 
-function PersonListController($scope, PersonSvc, RelationSvc, $modal, $log) {
+function EntityEditorController($scope, entity, $modalInstance) {
+    $scope.entity = entity;
 
+    $scope.ok = function () {
+        $modalInstance.close($scope.entity);
+    };
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+
+    $scope.delete = function () {
+        $modalInstance.dismiss('delete');
+    };
+}
+
+function AdminDomainListController($scope, DomainSvc, $modal, $log) {
     $scope._load = function () {
-        $scope.relations = RelationSvc.query({
-            domain: $scope.context.relation.domain.id
+        $scope.domains = DomainSvc.query();
+    };
+
+    $scope.addDomain = function () {
+        $scope._open({
+            name: '',
+            type: 'Congregation'
         });
     };
 
-    $scope.edit = function (relation) {
-        $scope._open(angular.copy(relation));
+    $scope.editDomain = function (domain) {
+        $scope._open(angular.copy(domain));
     };
 
-    $scope.addExistingUser = function () {
-        var id = prompt("Type id of user"),
-            rel;
-        rel = {
-            person: {
-                id: id
-            }
-        };
-        RelationSvc.save({
-            domain: $scope.context.relation.domain.id
-        }, rel).$promise.then($scope._load);
+    $scope.editRelations = function (domain) {
+        $scope._openRelations(domain);
     };
 
-    $scope._open = function (relation) {
+    $scope._open = function (domain) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/person.html',
-            controller: PersonController,
+            templateUrl: 'views/domain.html',
+            controller: EntityEditorController,
             size: 'md',
             resolve: {
-                relation: function () {
-                    return relation;
+                entity: function () {
+                    return domain;
                 }
             }
         });
 
-        modalInstance.result.then(function (relation) {
-            PersonSvc.save({
-                id: relation.person.id
-            }, relation.person).$promise.then($scope._load);
+        modalInstance.result.then(function (domain) {
+            DomainSvc.save({
+                id: domain.id
+            }, domain).$promise.then($scope._load);
 
         }, function (reason) {
-            if (reason === 'deleted') {
-                $scope._load();
+            if (reason === 'delete') {
+                if (confirm("Are you sure you want to delete the domain?")) {
+                    DomainSvc.remove({
+                        id: domain.id
+                    }).$promise.then($scope._load);
+                }
             }
             $log.info('Modal dismissed at: ' + new Date());
         });
     };
 
+    $scope._openRelations = function (domain) {
+
+        var modalInstance = $modal.open({
+            templateUrl: 'views/admin_domain-relations.html',
+            controller: function($scope, $modalInstance, domain) {
+                $scope.domain = domain;
+                $scope.close = function() {
+                    $modalInstance.dismiss('close');
+                };
+            },
+            size: 'lg',
+            resolve: {
+                domain: function () {
+                    return domain;
+                }
+            }
+        });
+
+        modalInstance.result.then(null, function (reason) {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+
     $scope._load();
+}
+
+function AdminPersonListController($scope, PersonSvc, $modal, $log) {
+    $scope._load = function() {
+        $scope.persons = PersonSvc.query();
+    };
+    
+    $scope.editPerson = function(person) {
+        $scope._open(angular.copy(person));
+    };
+    
+    $scope.addPerson = function() {
+        $scope._open({sex:'Male'});
+    };
+    
+    $scope._open = function (person) {
+
+        var modalInstance = $modal.open({
+            templateUrl: 'views/person.html',
+            controller: EntityEditorController,
+            size: 'md',
+            resolve: {
+                entity: function () {
+                    return person;
+                }
+            }
+        });
+
+        modalInstance.result.then(function (person) {
+            PersonSvc.save({
+                id: person.id
+            }, person).$promise.then($scope._load);
+
+        }, function (reason) {
+            if (reason === 'delete') {
+                if (confirm("Are you sure you want to delete the person?")) {
+                    PersonSvc.remove({
+                        id: person.id
+                    }).$promise.then($scope._load);
+                }
+            }
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+    
+    $scope._load();
+}
+
+function RelationListController($scope, PersonSvc, RelationSvc) {
+
 }
 
 function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modalInstance) {
@@ -312,9 +407,9 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.changeView = function (view) {
         $scope.calendarObj.fullCalendar('changeView', view);
     };
-    
-    $scope.getView = function() {
-        if($scope.calendarObj) {
+
+    $scope.getView = function () {
+        if ($scope.calendarObj) {
             var view = $scope.calendarObj.fullCalendar('getView');
             return view.name;
         } else {
@@ -381,6 +476,80 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.eventSources2 = [$scope.calEventsExt, $scope.eventsF, $scope.events];
 }
 
+function RelationListDirective($log, $modal, RelationSvc, PersonSvc) {
+    return {
+        restrict: 'E',
+        scope: {
+            domain: '='
+        },
+        link: function (scope, element, attrs) {
+            scope._load = function () {
+                if(scope.domain) {
+                    scope.relations = RelationSvc.query({
+                        domain: scope.domain.id
+                    });
+                }
+            };
+
+            scope.edit = function (relation) {
+                scope._open(angular.copy(relation));
+            };
+
+            scope.addExistingUser = function () {
+                var id = prompt("Type id of user"),
+                    rel;
+                rel = {
+                    person: {
+                        id: id
+                    }
+                };
+                RelationSvc.save({
+                    domain: scope.domain.id
+                }, rel).$promise.then(scope._load);
+            };
+
+            scope._open = function (relation) {
+
+                var modalInstance = $modal.open({
+                    templateUrl: 'views/relation.html',
+                    controller: PersonController,
+                    size: 'md',
+                    resolve: {
+                        relation: function () {
+                            return relation;
+                        }
+                    }
+                });
+
+                modalInstance.result.then(function (relation) {
+                    PersonSvc.save({
+                        id: relation.person.id
+                    }, relation.person).$promise.then(scope._load);
+
+                }, function (reason) {
+                    if (reason === 'deleted') {
+                        scope._load();
+                    }
+                    $log.info('Modal dismissed at: ' + new Date());
+                });
+            };
+
+            scope._load();
+        },
+        templateUrl: 'views/relation-list-directive.html'
+    };
+}
+
+function PersonFormDirective() {
+    return {
+        restrict: 'E',
+        scope: {
+            person: '='
+        },
+        templateUrl: 'views/person-form-directive.html'
+    };
+}
+
 function FieldServiceMeetingFormDirective() {
     return {
         restrict: 'E',
@@ -407,8 +576,12 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
     .config(AppConfig)
     .controller('LoginController', LoginController)
     .controller('MenuController', MenuController)
-    .controller('PersonListController', PersonListController)
+    .controller('RelationListController', RelationListController)
     .controller('CalendarController', CalendarController)
+    .controller('AdminDomainListController', AdminDomainListController)
+    .controller('AdminPersonListController', AdminPersonListController)
+    .directive('relationList', RelationListDirective)
+    .directive('personForm', PersonFormDirective)
     .directive('fieldServiceMeeting', FieldServiceMeetingFormDirective)
     .run(function ($rootScope, $location, PersonSvc) {
         $rootScope.eventTypes = {

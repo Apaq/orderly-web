@@ -1,0 +1,49 @@
+<div class="row persons-view">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-sm-3">
+                    <input type="search" class="form-control" placeholder="Søg..." disabled>
+                </div>
+                <div class="col-sm-9">
+                    <button type="button" class="btn btn-info btn-sm dropdown-toggle pull-right" ng-click="addPerson()">
+                                Tilføj
+                            </button>
+                    
+                </div>
+            </div>
+            
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Navn</th>
+                        <th>Mail</th>
+                        <th>Telefon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="person in persons" ng-click="editPerson(person)">
+                        <td>
+                            <img class="img-circle" src="http://ak7.picdn.net/shutterstock/videos/4495106/preview/stock-footage-green-environmental-business-concept-with-person-in-nature-corporate-businessmen-and-businesswomen.jpg" width="64" height="64">
+                        </td>
+                        <td>
+                            {{person.firstName}} {{person.lastName}}
+                        </td>
+                        <td>
+                            {{person.email}}
+                        </td>
+                        <td>
+                            {{person.phone}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+
+</div>
