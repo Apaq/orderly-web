@@ -81,7 +81,7 @@ function DomainSvc($resource, orderly) {
 }
 
 function RelationSvc($resource, orderly) {
-    return $resource(orderly.getServiceUrl() + 'domains/:id/relations');
+    return $resource(orderly.getServiceUrl() + 'domains/:domain/relations/:id');
 }
 
 function LoginSvc($q, localStorageService, $http, $rootScope, orderly, $log) {

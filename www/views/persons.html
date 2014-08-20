@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-sm-3">
+                    <input type="search" class="form-control" placeholder="Søg..." disabled>
+                </div>
+                <div class="col-sm-9">
+                    <div class="btn-group pull-right" dropdown is-open="status.isopen">
+                            <button type="button" class="btn btn-info btn-sm dropdown-toggle" ng-disabled="disabled">
+                                Tilføj <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a>Ny bruger</a></li>
+                                <li><a ng-click="addExistingUser()">Eksisterende bruger</a></li>
+
+                            </ul>
+                        </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Navn</th>
+                        <th>Mail</th>
+                        <th>Telefon</th>
+                        <th>Relation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="relation in relations" ng-click="edit(relation)">
+                        <td>
+                            <img class="img-circle" src="http://ak7.picdn.net/shutterstock/videos/4495106/preview/stock-footage-green-environmental-business-concept-with-person-in-nature-corporate-businessmen-and-businesswomen.jpg" width="64" height="64">
+                        </td>
+                        <td>
+                            {{relation.person.firstName}} {{relation.person.lastName}}
+                        </td>
+                        <td>
+                            {{relation.person.email}}
+                        </td>
+                        <td>
+                            {{relation.person.phone}}
+                        </td>
+                        <td>
+                            {{relation.roles.join(', ')}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+
+
+</div>
