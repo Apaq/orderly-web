@@ -262,8 +262,16 @@ html .fc,
 	}
 	 
 .fc-event {
+	border: #0079a1; /* default BORDER color */
+	background-color: #008cba; /* default BACKGROUND color */
+	color: #fff;               /* default TEXT color */
+	font-size: .6em;
+	cursor: default;
+	}
+
+.fc-view-month .fc-event {
 	border: 0px; /* default BORDER color */
-	background-color: none; /* default BACKGROUND color */
+	background-color: transparent; /* default BACKGROUND color */
 	color: #000;               /* default TEXT color */
 	font-size: .6em;
 	cursor: default;

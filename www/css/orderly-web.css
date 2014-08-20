@@ -32,6 +32,10 @@ body {
     padding-right: 15px !important;
 }
 
+.calendar-view .panel-heading .btn-group {
+  margin-top:24px;
+}
+
 .fc-event.selected {
     border: 1px solid #0079a1; /* default BORDER color */
 	background-color: #008cba; /* default BACKGROUND color */

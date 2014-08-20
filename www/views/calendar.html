@@ -1,18 +1,23 @@
-<div class="row no-padding no-margin">
+<div class="row no-padding no-margin calendar-view">
     <div class="col-sm-12">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         <div class="btn-group">
                             <button class="btn btn-default btn-sm" ng-click="prev()">&lt;</button>
                             <button class="btn btn-default btn-sm" ng-click="next()">&gt;</button>
                         </div>
+                        <div class="btn-group">
+                            <button class="btn btn-default btn-sm" ng-class="{active:getView() === 'month'}" ng-click="changeView('month')">Måned</button>
+                            <button class="btn btn-default btn-sm" ng-class="{active:getView() === 'agendaWeek'}" ng-click="changeView('agendaWeek')">Uge</button>
+                            <button class="btn btn-default btn-sm" ng-class="{active:getView() === 'agendaDay'}" ng-click="changeView('agendaDay')">Dag</button>
+                        </div>
                     </div>
-                    <div class="col-sm-8">
+                    <div class="col-sm-4">
                         <h1 style="text-align:center">{{date | date:'MMMM yyyy'}}</h1>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         <div class="btn-group pull-right" dropdown is-open="status.isopen">
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" ng-disabled="disabled">
                                 Udskriv <span class="caret"></span>

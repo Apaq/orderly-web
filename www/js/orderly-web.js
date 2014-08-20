@@ -27,6 +27,14 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             templateUrl: 'views/login.html',
             controller: 'LoginController'
         })
+        .when('/admin/domains', {
+            templateUrl: 'views/admin_domains.html',
+            controller: 'AdminDomainListController'
+        })
+        .when('/admin/persons', {
+            templateUrl: 'views/admin_persons.html',
+            controller: 'AdminPersonListController'
+        })
         .otherwise({
             redirectTo: '/login'
         });
@@ -34,22 +42,23 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 }
 
 function MenuController($scope, $location, LoginSvc) {
-    $scope.selectDomain = function(relation) {
+    $scope.selectDomain = function (relation) {
         $scope.context.relation = relation;
         $location.path('/calendar');
     };
-    
-    $scope.currentArea = function() {
-        var path = $location.path(), pathElements;
-        if(path.length > 0 && path.charAt(0) === '/') {
+
+    $scope.currentArea = function () {
+        var path = $location.path(),
+            pathElements;
+        if (path.length > 0 && path.charAt(0) === '/') {
             path = path.substr(1);
         }
-        
+
         pathElements = path.split('/');
         return pathElements[0];
     };
-    
-    $scope.logout = function() {
+
+    $scope.logout = function () {
         LoginSvc.deauthenticate();
     };
 }
@@ -63,21 +72,30 @@ function LoginController($scope, LoginSvc, $location) {
 }
 
 function PersonListController($scope, PersonSvc, RelationSvc, $modal, $log) {
-    
-    $scope._load = function() {
-        $scope.relations = RelationSvc.query({domain:$scope.context.relation.domain.id});
+
+    $scope._load = function () {
+        $scope.relations = RelationSvc.query({
+            domain: $scope.context.relation.domain.id
+        });
     };
-    
-    $scope.edit = function(relation) {
+
+    $scope.edit = function (relation) {
         $scope._open(angular.copy(relation));
     };
-    
-    $scope.addExistingUser = function() {
-        var id = prompt("Type id of user"), rel;
-        rel = {person:{id:id}};
-        RelationSvc.save({domain:$scope.context.relation.domain.id}, rel).$promise.then($scope._load);
+
+    $scope.addExistingUser = function () {
+        var id = prompt("Type id of user"),
+            rel;
+        rel = {
+            person: {
+                id: id
+            }
+        };
+        RelationSvc.save({
+            domain: $scope.context.relation.domain.id
+        }, rel).$promise.then($scope._load);
     };
-    
+
     $scope._open = function (relation) {
 
         var modalInstance = $modal.open({
@@ -92,24 +110,26 @@ function PersonListController($scope, PersonSvc, RelationSvc, $modal, $log) {
         });
 
         modalInstance.result.then(function (relation) {
-            PersonSvc.save({id:relation.person.id}, relation.person).$promise.then($scope._load);
-            
+            PersonSvc.save({
+                id: relation.person.id
+            }, relation.person).$promise.then($scope._load);
+
         }, function (reason) {
-            if(reason === 'deleted') {
+            if (reason === 'deleted') {
                 $scope._load();
             }
             $log.info('Modal dismissed at: ' + new Date());
         });
     };
-    
+
     $scope._load();
 }
 
 function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modalInstance) {
     $scope.relation = relation;
     $scope.person = relation.person;
-    
-    
+
+
     $scope.ok = function () {
         $modalInstance.close($scope.relation);
     };
@@ -122,8 +142,8 @@ function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modal
         var doReturn = function () {
             $modalInstance.dismiss('deleted');
         };
-        
-        if($scope.person.enabled) {
+
+        if ($scope.person.enabled) {
             if (confirm("Remove relation to user from the current domain?")) {
                 RelationSvc.remove({
                     domain: $scope.context.relation.domain.id,
@@ -137,7 +157,7 @@ function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modal
                 }).$promise.then(doReturn);
             }
         }
-        
+
     };
 }
 
@@ -145,40 +165,40 @@ function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modal
 function EventController($scope, EventSvc, $log, $location, event, $window, PersonSvc, $modalInstance) {
     $scope.event = event;
     $scope.edit = {};
-    
+
     // INIT
-    if($scope.event.agendas && $scope.event.agendas.length>0) {
+    if ($scope.event.agendas && $scope.event.agendas.length > 0) {
         $scope.selectedAgenda = $scope.event.agendas[0];
     } else {
         $scope.selectedAgenda = null;
     }
 
-    if($scope.selectedAgenda !== null && $scope.selectedAgenda.tasks && $scope.selectedAgenda.tasks.length) {
+    if ($scope.selectedAgenda !== null && $scope.selectedAgenda.tasks && $scope.selectedAgenda.tasks.length) {
         $scope.selectedTask = $scope.selectedAgenda.tasks[0];
     } else {
         $scope.selectedTask = null;
     }
-    
+
     $scope.persons = PersonSvc.query({
         domain: $scope.context.relation.domain.id
     });
-    
+
     $scope.edit.time = new Date($scope.event.startTime.getTime());
-    
+
     // WATCH
-    $scope.$watch(function() {
-            var time = $scope.edit.time ? $scope.edit.time.getTime() : -1;
-            return time;
-        }, function() {
-            if($scope.edit.time) {
-                $scope.event.startTime.setHours($scope.edit.time.getHours());
-                $scope.event.startTime.setMinutes($scope.edit.time.getMinutes());
-            }
+    $scope.$watch(function () {
+        var time = $scope.edit.time ? $scope.edit.time.getTime() : -1;
+        return time;
+    }, function () {
+        if ($scope.edit.time) {
+            $scope.event.startTime.setHours($scope.edit.time.getHours());
+            $scope.event.startTime.setMinutes($scope.edit.time.getMinutes());
+        }
     });
-    
-    
+
+
     // FUNCTIONS
-    $scope.alert = function(text) {
+    $scope.alert = function (text) {
         alert(text);
         return false;
     };
@@ -202,8 +222,8 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     };
 }
 
-function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) {
-    
+function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale) {
+
     $scope.open = function (size, event) {
 
         var modalInstance = $modal.open({
@@ -218,12 +238,14 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) 
         });
 
         modalInstance.result.then(function (event) {
-            EventSvc.save({id:event.id}, event).$promise.then(function() {
+            EventSvc.save({
+                id: event.id
+            }, event).$promise.then(function () {
                 $scope.calendarObj.fullCalendar('refetchEvents');
             });
-            
+
         }, function (reason) {
-            if(reason === 'deleted') {
+            if (reason === 'deleted') {
                 $scope.calendarObj.fullCalendar('refetchEvents');
             }
             $log.info('Modal dismissed at: ' + new Date());
@@ -245,6 +267,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) 
                     end: new Date(event.endTime.getTime()),
                     allDay: false,
                     className: ['field-service-meeting'],
+                    durationEditable: false,
                     orgEvent: event
                 });
             });
@@ -253,10 +276,13 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) 
     };
 
     $scope.onEventClick = function (event, jsEvent, view) {
-        EventSvc.get({id:event.orgEvent.id, mode:'full'}).$promise.then(function(fullEvent) {
+        EventSvc.get({
+            id: event.orgEvent.id,
+            mode: 'full'
+        }).$promise.then(function (fullEvent) {
             $scope.open('lg', fullEvent);
         });
-        
+
         //$location.path($location.path() + "/" + event.orgEvent.id);
     };
 
@@ -272,19 +298,28 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) 
         });
         //$scope.alertMessage = ('Event Droped to make dayDelta ' + dayDelta);
     };
-    
-    $scope.updateDate = function(view, element) {
+
+    $scope.updateDate = function (view, element) {
         $scope.date = $scope.calendarObj.fullCalendar('getDate');
     };
-    
+
     /* alert on Resize */
     $scope.alertOnResize = function (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) {
         $scope.alertMessage = ('Event Resized to make dayDelta ' + minuteDelta);
     };
 
     /* Change View */
-    $scope.changeView = function (view, calendar) {
-        calendar.fullCalendar('changeView', view);
+    $scope.changeView = function (view) {
+        $scope.calendarObj.fullCalendar('changeView', view);
+    };
+    
+    $scope.getView = function() {
+        if($scope.calendarObj) {
+            var view = $scope.calendarObj.fullCalendar('getView');
+            return view.name;
+        } else {
+            return null;
+        }
     };
 
 
@@ -294,6 +329,12 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) 
 
     $scope.prev = function () {
         $scope.calendarObj.fullCalendar('prev');
+    };
+
+    $scope._renderEvent = function (event, element) {
+        //                element.attr('tabindex', '0');
+        //                element.attr('ng-keypress', 'onKeyPress($event)');
+        //                element.attr('unselectable', 'off');
     };
 
 
@@ -310,33 +351,27 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal) 
         event.domain.id = $scope.context.relation.domain.id;
         event.startTime = startTime;
         //event.endTime = endTime;
-        
+
         $scope.open('lg', event);
     };
 
     /* config object */
     $scope.uiConfig = {
         calendar: {
+            dayNames: $locale.DATETIME_FORMATS.DAY,
+            dayNamesShort: $locale.DATETIME_FORMATS.SHORTDAY,
+            monthNames: $locale.DATETIME_FORMATS.MONTH,
+            monthNamesShort: $locale.DATETIME_FORMATS.SHORTMONTH,
             timeFormat: 'H(:mm)',
             firstDay: 1,
             height: 650,
             editable: true,
-            header: {
-                left: 'title',
-                center: '',
-                right: 'today prev,next'
-            },
             eventClick: $scope.onEventClick,
             eventDrop: $scope.onDrop,
             eventResize: $scope.alertOnResize,
             viewRender: $scope.updateDate,
             dayClick: $scope.addEvent,
-            eventRender: function (event, element) {
-
-                //                element.attr('tabindex', '0');
-                //                element.attr('ng-keypress', 'onKeyPress($event)');
-                //                element.attr('unselectable', 'off');
-            }
+            eventRender: $scope._renderEvent
         }
     };
 
@@ -381,7 +416,7 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
             CongregationMeeting: 'Møde',
             PublicWitnessing: 'Offentlig forkyndelse'
         };
-        
+
         $rootScope.taskTypes = {
             FieldServiceMeeting: 'Samling',
             Song: 'Sang',
@@ -399,8 +434,8 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
             ManagePlatform: 'Platform',
             Cleaning: 'Rengøring'
         };
-        
-        
+
+
         $rootScope.eventTemplates = {
             FieldServiceMeeting: {
                 "domain": {
@@ -421,10 +456,10 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
                 ]
             }
         };
-        
+
         $rootScope.context = {};
-        
-        
+
+
         $rootScope.$on("login", function (event, user) {
             $rootScope.context.user = user;
             $rootScope.context.relations = PersonSvc.relations({
@@ -443,6 +478,6 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
             $rootScope.context = {};
             $location.path('/login');
         });
-        
+
         $location.path('/login');
     });
