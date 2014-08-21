@@ -9,8 +9,22 @@
 </div>
 <div class="modal-body">
     <div class="row">
-        <div class="col-sm-12 well">
+        <div class="col-sm-12">
             <person-form person="person"></person-form>
+            <form class="form-horizontal">
+                <fieldset>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Roller</label>
+                        <div class="col-sm-10">
+                            <div class="checkbox" ng-repeat="(role, translatedRole) in relationRoles">
+                                <label ng-if="isValidForDomain(role)">
+                                    <input type="checkbox" name="relation.roles[]" value="{{role}}" ng-checked="relation.roles.indexOf(role) > -1" ng-click="toggleRole(role)">{{translatedRole}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
         </div>
     </div>
 

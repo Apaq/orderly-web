@@ -64,12 +64,13 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{context.relation.domain.name}}<span class="caret"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.relation">{{context.relation.domain.name}}<span class="caret"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.adminMode">Admin<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li ng-repeat="relation in context.relations"><a ng-click="selectDomain(relation)">{{relation.domain.name}}</a></li>
                             <li class="divider"></li>
-                            <li ng-if="context.user"><a ng-click="selectAdminMode()">Admin</a></li>
-                            <li ng-if="context.user" class="divider"></li>
+                            <li ng-if="context.user.role==='Admin'"><a ng-click="selectAdminMode()">Admin</a></li>
+                            <li ng-if="context.user.role==='Admin'" class="divider"></li>
                             <li><a ng-click="logout()">Log ud</a></li>
                         </ul>
                     </li>

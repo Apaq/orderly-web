@@ -41,17 +41,19 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 
 }
 
-function MenuController($scope, $location, LoginSvc) {
+function MenuController($scope, $location, LoginSvc, $route) {
     $scope.selectDomain = function (relation) {
         $scope.context.relation = relation;
         $scope.context.adminMode = false;
         $location.path('/calendar');
+        $route.reload();
     };
 
     $scope.selectAdminMode = function () {
         delete $scope.context.relation;
         $scope.context.adminMode = true;
         $location.path('/admin/domains');
+        $route.reload();
     };
 
     $scope.currentArea = function () {
@@ -148,9 +150,9 @@ function AdminDomainListController($scope, DomainSvc, $modal, $log) {
 
         var modalInstance = $modal.open({
             templateUrl: 'views/admin_domain-relations.html',
-            controller: function($scope, $modalInstance, domain) {
+            controller: function ($scope, $modalInstance, domain) {
                 $scope.domain = domain;
-                $scope.close = function() {
+                $scope.close = function () {
                     $modalInstance.dismiss('close');
                 };
             },
@@ -171,18 +173,20 @@ function AdminDomainListController($scope, DomainSvc, $modal, $log) {
 }
 
 function AdminPersonListController($scope, PersonSvc, $modal, $log) {
-    $scope._load = function() {
+    $scope._load = function () {
         $scope.persons = PersonSvc.query();
     };
-    
-    $scope.editPerson = function(person) {
+
+    $scope.editPerson = function (person) {
         $scope._open(angular.copy(person));
     };
-    
-    $scope.addPerson = function() {
-        $scope._open({sex:'Male'});
+
+    $scope.addPerson = function () {
+        $scope._open({
+            sex: 'Male'
+        });
     };
-    
+
     $scope._open = function (person) {
 
         var modalInstance = $modal.open({
@@ -212,7 +216,7 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
             $log.info('Modal dismissed at: ' + new Date());
         });
     };
-    
+
     $scope._load();
 }
 
@@ -220,10 +224,29 @@ function RelationListController($scope, PersonSvc, RelationSvc) {
 
 }
 
-function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modalInstance) {
+function RelationController($scope, $log, relation, domain, RelationSvc, PersonSvc, $modalInstance) {
     $scope.relation = relation;
     $scope.person = relation.person;
+    $scope.domain = domain;
 
+    $scope.isValidForDomain = function (role) {
+        return $scope.relationRoleDomainTypes[role].indexOf($scope.domain.type) >= 0;
+    };
+
+
+    $scope.toggleRole = function (role) {
+        var idx = $scope.relation.roles.indexOf(role);
+
+        // is currently selected
+        if (idx > -1) {
+            $scope.relation.roles.splice(idx, 1);
+        }
+
+        // is newly selected
+        else {
+            $scope.relation.roles.push(role);
+        }
+    };
 
     $scope.ok = function () {
         $modalInstance.close($scope.relation);
@@ -234,25 +257,7 @@ function PersonController($scope, $log, relation, RelationSvc, PersonSvc, $modal
     };
 
     $scope.delete = function () {
-        var doReturn = function () {
-            $modalInstance.dismiss('deleted');
-        };
-
-        if ($scope.person.enabled) {
-            if (confirm("Remove relation to user from the current domain?")) {
-                RelationSvc.remove({
-                    domain: $scope.context.relation.domain.id,
-                    id: $scope.relation.id
-                }).$promise.then(doReturn);
-            }
-        } else {
-            if (confirm("User is controlled by the current domain. Delete the user from the system?")) {
-                PersonSvc.remove({
-                    id: $scope.person.id
-                }).$promise.then(doReturn);
-            }
-        }
-
+        $modalInstance.dismiss('delete');
     };
 }
 
@@ -349,25 +354,29 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
 
     /* event source that calls a function on every view switch */
     $scope.eventsF = function (start, end, callback) {
-        EventSvc.query({
-            domain: '4028d7f246f261870146f261c6240000',
-            from: start,
-            to: end
-        }).$promise.then(function (events) {
-            var tEvents = [];
-            angular.forEach(events, function (event) {
-                tEvents.push({
-                    title: $scope.eventTypes[event.type],
-                    start: new Date(event.startTime.getTime()),
-                    end: new Date(event.endTime.getTime()),
-                    allDay: false,
-                    className: ['field-service-meeting'],
-                    durationEditable: false,
-                    orgEvent: event
+        if($scope.context.relation) {
+            EventSvc.query({
+                domain: $scope.context.relation.domain.id,
+                from: start,
+                to: end
+            }).$promise.then(function (events) {
+                var tEvents = [];
+                angular.forEach(events, function (event) {
+                    tEvents.push({
+                        title: $scope.eventTypes[event.type],
+                        start: new Date(event.startTime.getTime()),
+                        end: new Date(event.endTime.getTime()),
+                        allDay: false,
+                        className: ['field-service-meeting'],
+                        durationEditable: false,
+                        orgEvent: event
+                    });
                 });
+                callback(tEvents);
             });
-            callback(tEvents);
-        });
+        } else {
+            callback([]);
+        }
     };
 
     $scope.onEventClick = function (event, jsEvent, view) {
@@ -378,7 +387,6 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             $scope.open('lg', fullEvent);
         });
 
-        //$location.path($location.path() + "/" + event.orgEvent.id);
     };
 
     /* alert on Drop */
@@ -391,7 +399,6 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             $log.info("Unable to save event after drop. Reason: " + reason);
             revertFunc();
         });
-        //$scope.alertMessage = ('Event Droped to make dayDelta ' + dayDelta);
     };
 
     $scope.updateDate = function (view, element) {
@@ -476,7 +483,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.eventSources2 = [$scope.calEventsExt, $scope.eventsF, $scope.events];
 }
 
-function RelationListDirective($log, $modal, RelationSvc, PersonSvc) {
+function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q) {
     return {
         restrict: 'E',
         scope: {
@@ -484,7 +491,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc) {
         },
         link: function (scope, element, attrs) {
             scope._load = function () {
-                if(scope.domain) {
+                if (scope.domain) {
                     scope.relations = RelationSvc.query({
                         domain: scope.domain.id
                     });
@@ -492,7 +499,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc) {
             };
 
             scope.edit = function (relation) {
-                scope._open(angular.copy(relation));
+                scope._open(relation);
             };
 
             scope.addExistingUser = function () {
@@ -512,23 +519,48 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc) {
 
                 var modalInstance = $modal.open({
                     templateUrl: 'views/relation.html',
-                    controller: PersonController,
+                    controller: RelationController,
                     size: 'md',
                     resolve: {
                         relation: function () {
-                            return relation;
+                            return angular.copy(relation);
+                        },
+                        domain: function() {
+                            return scope.domain;
                         }
                     }
                 });
 
-                modalInstance.result.then(function (relation) {
-                    PersonSvc.save({
+                modalInstance.result.then(function (changedRelation) {
+                    var promises = [];
+                    promises.push(PersonSvc.save({
                         id: relation.person.id
-                    }, relation.person).$promise.then(scope._load);
+                    }, relation.person).$promise);
+
+                    if (!angular.equals(relation.roles, changedRelation.roles)) {
+                        promises.push(RelationSvc.save({
+                            domain: scope.domain.id,
+                            id: changedRelation.id
+                        }, changedRelation).$promise);
+                    }
+                    $q.all(promises).then(scope._load);
 
                 }, function (reason) {
-                    if (reason === 'deleted') {
-                        scope._load();
+                    if (reason === 'delete') {
+                        if (scope.relation.person.enabled) {
+                            if (confirm("Remove relation to user from the current domain?")) {
+                                RelationSvc.remove({
+                                    domain: scope.domain.id,
+                                    id: relation.id
+                                }).$promise.then(scope._load);
+                            }
+                        } else {
+                            if (confirm("User is controlled by the current domain. Delete the user from the system?")) {
+                                PersonSvc.remove({
+                                    id: relation.person.id
+                                }).$promise.then(scope._load);
+                            }
+                        }
                     }
                     $log.info('Modal dismissed at: ' + new Date());
                 });
@@ -583,7 +615,7 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
     .directive('relationList', RelationListDirective)
     .directive('personForm', PersonFormDirective)
     .directive('fieldServiceMeeting', FieldServiceMeetingFormDirective)
-    .run(function ($rootScope, $location, PersonSvc) {
+    .run(function ($rootScope, $location, PersonSvc, $route) {
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
             CongregationMeeting: 'Møde',
@@ -630,6 +662,23 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
             }
         };
 
+        $rootScope.relationRoles = {
+            Coordinator: "Kordinator",
+            Elder: "Ældste",
+            Secretary: "Sekretær",
+            SchoolOverseer: "Skoletjener",
+            ServiceOverseer: "Tjenestetilsynsmand"
+        };
+
+        $rootScope.relationRoleDomainTypes = {
+            Coordinator: ['Congregation', 'Circuit', 'Region', 'ServiceGroup', 'ServiceUnit'],
+            Elder: ['Congregation'],
+            Secretary: ['Congregation'],
+            SchoolOverseer: ['Congregation'],
+            ServiceOverseer: ['Congregation']
+        };
+
+
         $rootScope.context = {};
 
 
@@ -641,6 +690,7 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
             $rootScope.context.relations.$promise.then(function () {
                 if ($rootScope.context.relations.length > 0) {
                     $rootScope.context.relation = $rootScope.context.relations[0];
+                    $route.reload();
                 } else {
                     alert('Ingen relation');
                 }
