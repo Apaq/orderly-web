@@ -53,15 +53,46 @@ function Config($httpProvider, orderlyProvider) {
     });
 }
 
+function SystemSvc($http, orderly, $q) {
+    return {
+        checkUsernameAvailable: function (username) {
+            return $http.get(orderly.getServiceUrl() + 'system/usernames/' + username).
+            success(function () {
+                return false;
+            }).
+            error(function (data, status) {
+                if(status === 404) {
+                    return true;
+                } else {
+                    return $q.reject("Server did not respond as expected. Status: " + status);
+                }
+            });
+        },
+        changePassword: function(oldPassword, newPassword) {
+            var data = {
+                oldPassword: oldPassword,
+                newPassword: newPassword
+            };
+            return $http.post(orderly.getServiceUrl() + 'system/password', data);
+        },
+        changeUserRole: function(userId, newRole) {
+            return $http.post(orderly.getServiceUrl() + 'system/users/' + userId + '/role', newRole);
+        },
+        setUserEnabled: function(userId, value) {
+            value = value === true;
+            return $http.post(orderly.getServiceUrl() + 'system/users/' + userId + '/enabled', value);
+        }
+    };
+}
+
 function PersonSvc($resource, orderly) {
-    return $resource(orderly.getServiceUrl() + 'persons/:id', null,
-       {
-           'relations': { 
-               method:'GET',
-               url: orderly.getServiceUrl() + 'persons/:id/relations',
-               isArray: true
-           }
-       });
+    return $resource(orderly.getServiceUrl() + 'persons/:id', null, {
+        'relations': {
+            method: 'GET',
+            url: orderly.getServiceUrl() + 'persons/:id/relations',
+            isArray: true
+        }
+    });
 }
 
 function AssignmentSvc($resource, orderly) {
@@ -165,5 +196,6 @@ angular.module('orderly.services', ['ngResource', 'LocalStorageModule'])
         'EventSvc': EventSvc,
         'LoginSvc': LoginSvc,
         'RelationSvc': RelationSvc,
-        'DomainSvc': DomainSvc
+        'DomainSvc': DomainSvc,
+        'SystemSvc': SystemSvc
     });

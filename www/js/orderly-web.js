@@ -186,11 +186,44 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
             sex: 'Male'
         });
     };
+    
+    $scope.changeCredentials = function(person) {
+        $scope._open = function (person) {
+
+        var modalInstance = $modal.open({
+            templateUrl: 'views/admin_change-credentials.html',
+            controller: AdminChangeCredentialsController,
+            size: 'md',
+            resolve: {
+                entity: function () {
+                    return person;
+                }
+            }
+        });
+
+        modalInstance.result.then(function (person) {
+            PersonSvc.save({
+                id: person.id
+            }, person).$promise.then($scope._load);
+
+        }, function (reason) {
+            if (reason === 'delete') {
+                if (confirm("Are you sure you want to delete the person?")) {
+                    PersonSvc.remove({
+                        id: person.id
+                    }).$promise.then($scope._load);
+                }
+            }
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+
+    };
 
     $scope._open = function (person) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/person.html',
+            templateUrl: 'views/admin_person.html',
             controller: EntityEditorController,
             size: 'md',
             resolve: {
@@ -324,6 +357,8 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
 
 function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale) {
 
+    $scope.currentRange = null;
+
     $scope.open = function (size, event) {
 
         var modalInstance = $modal.open({
@@ -352,14 +387,72 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
         });
     };
 
+    $scope.print = function (type) {
+        
+        // First get all events
+        EventSvc.query({
+            domain: $scope.context.relation.domain.id,
+            from: $scope.currentRange.start,
+            to: $scope.currentRange.end,
+            type: 'FieldServiceMeeting',
+            mode: 'full'
+        }).$promise.then(function (events) {
+            events = $filter('orderBy')(events, 'startTime');
+            var pdf = new jsPDF('p', 'pt', 'a4'),
+                src, data = [],
+                margins;
+            
+            pdf.setLineWidth(1).setFontSize(20);
+            pdf.text("Samlinger for " + $scope.context.relation.domain.name, 30, 60);
+            
+            pdf.setLineWidth(1).setFontSize(14);
+            margins = {
+                left: 60,
+                top: 40,
+                right: 40,
+                bottom: 60
+            };
+
+            angular.forEach(events, function (event) {
+                var conductor = "";
+                if (event.agendas && event.agendas.length > 0 &&
+                    event.agendas[0].tasks && event.agendas[0].tasks.length > 0 &&
+                    event.agendas[0].tasks[0].assignments && event.agendas[0].tasks[0].assignments.length > 0) {
+                    angular.forEach(event.agendas[0].tasks[0].assignments, function (ass) {
+                        if (ass.type === 'Conductor' && ass.assignee) {
+                            conductor = ass.assignee.firstName + ' ' + ass.assignee.lastName;
+                        }
+                    });
+                }
+                data.push({
+                    'Dato': $filter('date')(event.startTime, 'fullDate'),
+                    'Tid': $filter('date')(event.startTime, 'shortTime'),
+                    'Leder': conductor
+                });
+            });
+            pdf.table(30, 100, data, ['Dato', 'Tid', 'Leder'], {
+                printHeaders: true,
+                autoSize: true,
+                margins: margins
+            });
+            src = pdf.output('datauristring');
+            window.open(src);
+        });
+
+    };
+
     /* event source that calls a function on every view switch */
     $scope.eventsF = function (start, end, callback) {
-        if($scope.context.relation) {
+        if ($scope.context.relation) {
             EventSvc.query({
                 domain: $scope.context.relation.domain.id,
                 from: start,
                 to: end
             }).$promise.then(function (events) {
+                $scope.currentRange = {
+                    start: start,
+                    end: end
+                };
                 var tEvents = [];
                 angular.forEach(events, function (event) {
                     tEvents.push({
@@ -525,7 +618,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q) {
                         relation: function () {
                             return angular.copy(relation);
                         },
-                        domain: function() {
+                        domain: function () {
                             return scope.domain;
                         }
                     }

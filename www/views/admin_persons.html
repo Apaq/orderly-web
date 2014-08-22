@@ -21,12 +21,13 @@
                         <th>Navn</th>
                         <th>Mail</th>
                         <th>Telefon</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="person in persons" ng-click="editPerson(person)">
                         <td>
-                            <img class="img-circle" src="http://best.aau.dk//wp-content/uploads/2014/02/unknown-avatar.png" width="32" height="32">
+                            <img class="img-circle" src="http://best.aau.dk//wp-content/uploads/2014/02/unknown-avatar.png" width="16" height="16">
                         </td>
                         <td>
                             {{person.firstName}} {{person.lastName}}
@@ -36,6 +37,13 @@
                         </td>
                         <td>
                             {{person.phone}}
+                        </td>
+                        <td>
+                            <a ng-if="!person.username" ng-click="convertToUser(); $event.stopPropagation();" title="Konverter til bruger">
+                                <span class="glyphicon glyphicon-user"></span>
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </a>
+                            <!--a ng-click="changeCredentials(); $event.stopPropagation();"><span class="glyphicon glyphicon-lock" title="Akkreditiver"></span></a-->
                         </td>
                     </tr>
                 </tbody>
