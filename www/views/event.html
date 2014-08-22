@@ -8,7 +8,7 @@
             <div class="form-inline">
                 <div class="form-group pull-right">
                     <label class="control-label" for="inputSuccess4">Starttidspunkt:</label>
-                    <input type="time" class="form-control input-sm" ng-model="edit.time">
+                    <input type="time" class="form-control input-sm" ng-model="edit.time" ng-readonly="readonly">
                 </div>
 
             </div>
@@ -17,21 +17,21 @@
     </div>
 </div>
 <div class="modal-body">
-    <div class="row" ng-if="selectedTask !== null">
+    <div class="row" ng-if="selection.task !== null">
         <div class="col-sm-4">
             <ul class="nav nav-pills nav-stacked" style="max-width: 300px;">
-                <li ng-repeat="task in selectedAgenda.tasks" ng-class="{active:selectedTask.id===task.id}">
-                    <a ng-click="alert('select')">{{taskTypes[task.type]}}<span class="badge pull-right" ng-click="alert('slet')">Slet</span></a>
-
+                <li ng-repeat="task in selection.agenda.tasks" ng-class="{active:(selection.task.id===task.id)}">
+                    <a ng-click="selection.task=task">{{taskTypes[task.type]}}</a>
                 </li>
             </ul>
         </div>
         <div class="col-sm-8 well">
-            <field-service-meeting ng-if="selectedTask.type==='FieldServiceMeeting'" task="selectedTask" persons="persons"></field-service-meeting>
+            <field-service-meeting ng-if="selection.task.type==='FieldServiceMeeting'" task="selection.task" persons="persons" readonly="readonly"></field-service-meeting>
+            <witnessing ng-if="selection.task.type==='Witnessing'" task="selection.task" persons="persons" readonly="readonly"></witnessing>
         </div>
     </div>
 
-    <div class="row" ng-if="selectedTask === null">
+    <div class="row" ng-if="selection.task === null">
         <h2 class="text-center">Ingen opgaver i begivenheden</h2>
         <h6 class="taxt-center"><a>Opret opgave <i class="glyphicon glyphicon-plus"></i></a></h6>
     </div>
@@ -39,10 +39,13 @@
 
 
 </div>
-<div class="modal-footer">
+<div class="modal-footer" ng-if="!readonly">
     <button class="btn btn-primary" ng-click="ok()">OK</button>
     <button class="btn btn-warning" ng-click="cancel()">Annuller</button>
 
     <button class="btn btn-danger" ng-click="delete()">Slet</button>
+</div>
+<div class="modal-footer" ng-if="readonly">
+    <button class="btn btn-warning" ng-click="cancel()">Luk</button>
 </div>
 

@@ -3,7 +3,8 @@
         <div class="form-group">
             <label for="select" class="col-lg-2 control-label">Leder</label>
             <div class="col-lg-10">
-                <select class="form-control" ng-model="task.assignments[0].assignee.id" ng-options="person.id as person.firstName+' '+person.lastName for person in persons">
+                <input type="text" ng-if="readonly" ng-readonly="true" ng-value="task.assignments[0].assignee.firstName + ' ' + task.assignments[0].assignee.lastName">
+                <select  ng-if="!readonly" class="form-control" ng-model="task.assignments[0].assignee.id" ng-options="person.id as person.firstName+' '+person.lastName for person in persons">
                   <option value="">-- Ingen --</option>
                 </select>
             </div>
@@ -11,7 +12,7 @@
         <div class="form-group">
             <label for="select" class="col-lg-2 control-label">Varighed</label>
             <div class="col-lg-10">
-                <input type="number" ng-model="task.duration">
+                <input type="number" ng-model="task.duration" ng-readonly="readonly"> minutter
             </div>
         </div>
     </fieldset>

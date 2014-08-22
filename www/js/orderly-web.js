@@ -295,21 +295,23 @@ function RelationController($scope, $log, relation, domain, RelationSvc, PersonS
 }
 
 
-function EventController($scope, EventSvc, $log, $location, event, $window, PersonSvc, $modalInstance) {
+function EventController($scope, EventSvc, $log, $location, event, $window, PersonSvc, $modalInstance, readonly) {
     $scope.event = event;
+    $scope.readonly = readonly;
     $scope.edit = {};
+    $scope.selection = {};
 
     // INIT
     if ($scope.event.agendas && $scope.event.agendas.length > 0) {
-        $scope.selectedAgenda = $scope.event.agendas[0];
+        $scope.selection.agenda = $scope.event.agendas[0];
     } else {
-        $scope.selectedAgenda = null;
+        $scope.selection.agenda = null;
     }
 
-    if ($scope.selectedAgenda !== null && $scope.selectedAgenda.tasks && $scope.selectedAgenda.tasks.length) {
-        $scope.selectedTask = $scope.selectedAgenda.tasks[0];
+    if ($scope.selection.agenda !== null && $scope.selection.agenda.tasks && $scope.selection.agenda.tasks.length) {
+        $scope.selection.task = $scope.selection.agenda.tasks[0];
     } else {
-        $scope.selectedTask = null;
+        $scope.selection.task = null;
     }
 
     $scope.persons = PersonSvc.query({
@@ -358,8 +360,18 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
 function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale) {
 
     $scope.currentRange = null;
+    
+    $scope._canEdit = function() {
+        var result = false;
+        angular.forEach($scope.context.relation.roles, function(role) {
+            if(role === 'Coordinator') {
+                result = true;
+            }
+        });
+        return result;
+    };
 
-    $scope.open = function (size, event) {
+    $scope.open = function (size, event, readonly) {
 
         var modalInstance = $modal.open({
             templateUrl: 'views/event.html',
@@ -368,6 +380,9 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             resolve: {
                 event: function () {
                     return event;
+                },
+                readonly: function() {
+                    return readonly === true;
                 }
             }
         });
@@ -477,7 +492,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             id: event.orgEvent.id,
             mode: 'full'
         }).$promise.then(function (fullEvent) {
-            $scope.open('lg', fullEvent);
+            $scope.open('lg', fullEvent, !$scope._canEdit());
         });
 
     };
@@ -534,20 +549,24 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
 
 
     $scope.addEvent = function (date, jsEvent, view) {
-        var startTime = new Date(date.getTime());
-        var endTime = new Date(date.getTime());
+        if($scope._canEdit()) {
+            var startTime = new Date(date.getTime());
+            var endTime = new Date(date.getTime());
 
-        startTime.setHours(10);
-        endTime.setHours(10);
-        endTime.setMinutes(15);
+            startTime.setHours(10);
+            endTime.setHours(10);
+            endTime.setMinutes(15);
 
-        var type = 'FieldServiceMeeting';
-        var event = angular.copy($scope.eventTemplates[type]);
-        event.domain.id = $scope.context.relation.domain.id;
-        event.startTime = startTime;
-        //event.endTime = endTime;
+            var type = 'FieldServiceMeeting';
+            var event = angular.copy($scope.eventTemplates[type]);
+            event.domain.id = $scope.context.relation.domain.id;
+            event.startTime = startTime;
+            //event.endTime = endTime;
 
-        $scope.open('lg', event);
+            $scope.open('lg', event);
+        } else {
+            alert("Du har ikke tilladelse til at oprette nye begivenheder.");
+        }
     };
 
     /* config object */
@@ -558,6 +577,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             monthNames: $locale.DATETIME_FORMATS.MONTH,
             monthNamesShort: $locale.DATETIME_FORMATS.SHORTMONTH,
             timeFormat: 'H(:mm)',
+            axisFormat: 'H(:mm)',
             firstDay: 1,
             height: 650,
             editable: true,
@@ -566,7 +586,10 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             eventResize: $scope.alertOnResize,
             viewRender: $scope.updateDate,
             dayClick: $scope.addEvent,
-            eventRender: $scope._renderEvent
+            eventRender: $scope._renderEvent,
+            allDaySlot: false,
+            minTime: '7:30',
+            maxTime: '22.30'
         }
     };
 
@@ -680,7 +703,8 @@ function FieldServiceMeetingFormDirective() {
         restrict: 'E',
         scope: {
             task: '=',
-            persons: '='
+            persons: '=',
+            readonly: '='
         },
         link: function (scope, element, attrs) {
             if (!scope.task.assignments || scope.task.assignments.length === 0) {
@@ -697,6 +721,38 @@ function FieldServiceMeetingFormDirective() {
     };
 }
 
+function WitnessingFormDirective() {
+    return {
+        restrict: 'E',
+        scope: {
+            task: '=',
+            persons: '=',
+            readonly: '='
+        },
+        link: function (scope, element, attrs) {
+            if (!scope.task.assignments || scope.task.assignments.length === 0) {
+                scope.task.assignments = [{
+                    type: 'Conductor',
+                    assignee: {
+                        id: null
+                    }
+                }];
+            }
+            
+            if (scope.task.assignments.length < 2) {
+                scope.task.assignments.push({
+                    type: 'Assistant',
+                    assignee: {
+                        id: null
+                    }
+                });
+            }
+
+        },
+        templateUrl: 'views/witnessing-directive.html'
+    };
+}
+
 angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui.bootstrap'])
     .config(AppConfig)
     .controller('LoginController', LoginController)
@@ -708,6 +764,7 @@ angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui
     .directive('relationList', RelationListDirective)
     .directive('personForm', PersonFormDirective)
     .directive('fieldServiceMeeting', FieldServiceMeetingFormDirective)
+    .directive('witnessing', WitnessingFormDirective)
     .run(function ($rootScope, $location, PersonSvc, $route) {
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
