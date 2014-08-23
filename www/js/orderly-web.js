@@ -74,7 +74,7 @@ function MenuController($scope, $location, LoginSvc, $route) {
 
 function LoginController($scope, LoginSvc, $location, $log, $animate) {
     $scope.login = function () {
-        LoginSvc.authenticate($scope.user, $scope.pass).then(function () {
+        LoginSvc.authenticate($scope.user, $scope.pass, $scope.rememberMe).then(function () {
             $location.path('/calendar');
         }, function(reason) {
             $log.info("Error while authenticating: " + reason);
@@ -771,7 +771,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('personForm', PersonFormDirective)
     .directive('fieldServiceMeeting', FieldServiceMeetingFormDirective)
     .directive('witnessing', WitnessingFormDirective)
-    .run(function ($rootScope, $location, PersonSvc, $route) {
+    .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
             CongregationMeeting: 'Møde',
@@ -858,5 +858,10 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
             $location.path('/login');
         });
 
-        $location.path('/login');
+        LoginSvc.authenticate().then(function() {
+            $location.path('/calendar');
+        }, function() {
+            $location.path('/login');
+        });
+        
     });
