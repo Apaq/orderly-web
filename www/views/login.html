@@ -1,6 +1,6 @@
 <div class="row">
-<div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-    <h1>Login</h1>
+    <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3" id="loginform-wrapper">
+        <h1>Login</h1>
         <form id="loginform">
             <div class="form-group">
                 <label for="login-username" translate="LOGIN.USERNAME" class="ng-scope">Username</label>
@@ -12,11 +12,11 @@
             </div>
             <div class="checkbox">
                 <label class="ng-binding">
-                    <input type="checkbox" ng-model="rememberMe"> Save on this computer
+                    <input type="checkbox" ng-model="rememberMe">Save on this computer
                 </label>
             </div>
             <button type="submit" ng-click="login()" class="btn btn-primary" translate="LOGIN.LOG_IN">Log in</button>
             <button ng-click="requestPassword()" class="btn btn-default" translate="LOGIN.FORGOT_PASSWORD">Forgot Password</button>
         </form>
     </div>
-    </div>
+</div>

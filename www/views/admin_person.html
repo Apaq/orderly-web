@@ -1,8 +1,8 @@
-<div class="modal-header" ng-init="lockCredentials = (entity.username !== null);entity.password='qwerty'">
+<div class="modal-header" ng-init="lockCredentials = !(!entity.username);">
     <div class="row">
         <div class="col-sm-6">
             <h3 class="modal-title">{{entity.firstName}} {{entity.lastName}} <small>{{entity.id}}</small></h3>
-
+            {{entity}}
         </div>
         <div class="col-sm-6">
         </div>

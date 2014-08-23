@@ -72,10 +72,16 @@ function MenuController($scope, $location, LoginSvc, $route) {
     };
 }
 
-function LoginController($scope, LoginSvc, $location, $log) {
+function LoginController($scope, LoginSvc, $location, $log, $animate) {
     $scope.login = function () {
         LoginSvc.authenticate($scope.user, $scope.pass).then(function () {
             $location.path('/calendar');
+        }, function(reason) {
+            $log.info("Error while authenticating: " + reason);
+            var el = angular.element('#loginform-wrapper');
+            $animate.addClass(el, 'invalid-login', function() {
+                $animate.removeClass(el, 'invalid-login');
+            });
         });
     };
 }
@@ -651,7 +657,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q) {
                     var promises = [];
                     promises.push(PersonSvc.save({
                         id: relation.person.id
-                    }, relation.person).$promise);
+                    }, changedRelation.person).$promise);
 
                     if (!angular.equals(relation.roles, changedRelation.roles)) {
                         promises.push(RelationSvc.save({
@@ -753,7 +759,7 @@ function WitnessingFormDirective() {
     };
 }
 
-angular.module('orderly.web', ['ngRoute', 'orderly.services', 'ui.calendar', 'ui.bootstrap'])
+angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.calendar', 'ui.bootstrap'])
     .config(AppConfig)
     .controller('LoginController', LoginController)
     .controller('MenuController', MenuController)
