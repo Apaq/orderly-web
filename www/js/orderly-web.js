@@ -39,6 +39,10 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             templateUrl: 'views/admin_persons.html',
             controller: 'AdminPersonListController'
         })
+        .when('/profile', {
+            templateUrl: 'views/profile.html',
+            controller: 'ProfileController'
+        })
         .otherwise({
             redirectTo: '/login'
         });
@@ -48,6 +52,7 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 function MenuController($scope, $location, LoginSvc, $route) {
     $scope.selectDomain = function (relation) {
         $scope.context.relation = relation;
+        $scope.context.mode = 'domain';
         $scope.context.adminMode = false;
         $location.path('/calendar');
         $route.reload();
@@ -55,8 +60,15 @@ function MenuController($scope, $location, LoginSvc, $route) {
 
     $scope.selectAdminMode = function () {
         delete $scope.context.relation;
-        $scope.context.adminMode = true;
+        $scope.context.mode = 'admin';
         $location.path('/admin/domains');
+        $route.reload();
+    };
+    
+    $scope.selectProfile = function () {
+        delete $scope.context.relation;
+        $scope.context.mode = 'profile';
+        $location.path('/profile');
         $route.reload();
     };
 
@@ -123,6 +135,20 @@ function NewPasswordController($scope, SystemSvc) {
                 break;
                 
         }
+    };
+}
+
+function ProfileController($scope, SystemSvc) {
+    $scope.person = null;
+    $scope.newPasswordRequest = {oldPassword:'', newPassword:'', newPassword2:''};
+    $scope.changePassword = function() {
+        if($scope.newPasswordRequest.newPassword !== $scope.newPasswordRequest.newPassword2) {
+            alert("The passwords does not match");
+            return;
+        }
+        SystemSvc.changePassword($scope.newPasswordRequest.oldPassword, $scope.newPasswordRequest.newPassword).then(function() {
+            alert("Password changed");
+        });
     };
 }
 
@@ -803,6 +829,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .config(AppConfig)
     .controller('LoginController', LoginController)
     .controller('NewPasswordController', NewPasswordController)
+    .controller('ProfileController', ProfileController)
     .controller('MenuController', MenuController)
     .controller('RelationListController', RelationListController)
     .controller('CalendarController', CalendarController)
@@ -851,7 +878,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
                         "tasks": [
                             {
                                 "type": "FieldServiceMeeting",
-                                "duration": 900000
+                                "duration": 15
                             }
                         ]
                     }
@@ -887,6 +914,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
             $rootScope.context.relations.$promise.then(function () {
                 if ($rootScope.context.relations.length > 0) {
                     $rootScope.context.relation = $rootScope.context.relations[0];
+                    $rootScope.context.mode = 'domain';
                     $route.reload();
                 } else {
                     alert('Ingen relation');

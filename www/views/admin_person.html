@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-sm-6">
             <h3 class="modal-title">{{entity.firstName}} {{entity.lastName}} <small>{{entity.id}}</small></h3>
-            {{entity}}
+            
         </div>
         <div class="col-sm-6">
         </div>
@@ -24,7 +24,8 @@
                     <div class="form-group">
                         <label for="inputPassword" class="col-lg-2 control-label">Kodeord</label>
                         <div class="col-lg-10">
-                            <input type="password" class="form-control" id="inputPassword" ng-model="entity.password" placeholder="Kodeord" ng-readonly="lockCredentials">
+                            <input type="password" class="form-control" id="inputPassword" ng-model="entity.password" placeholder="Kodeord" ng-if="!lockCredentials">
+                            <span ng-if="lockCredentials">********</span>
                         </div>
                     </div>
                     

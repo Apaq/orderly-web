@@ -33,17 +33,14 @@
                             {{person.firstName}} {{person.lastName}}
                         </td>
                         <td>
-                            {{person.email}}
+                            {{person.emailAddress}}&nbsp;<span class="glyphicon glyphicon-ok-circle" ng-if="person.emailAddressValidated"></span>
                         </td>
                         <td>
                             {{person.phone}}
                         </td>
                         <td>
-                            <a ng-if="!person.username" ng-click="convertToUser(); $event.stopPropagation();" title="Konverter til bruger">
-                                <span class="glyphicon glyphicon-user"></span>
-                                <span class="glyphicon glyphicon-plus"></span>
-                            </a>
-                            <!--a ng-click="changeCredentials(); $event.stopPropagation();"><span class="glyphicon glyphicon-lock" title="Akkreditiver"></span></a-->
+                            <span class="glyphicon glyphicon-user" ng-if="person.enabled"></span>
+                           
                         </td>
                     </tr>
                 </tbody>

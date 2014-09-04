@@ -73,7 +73,7 @@ function SystemSvc($http, orderly, $q) {
                 oldPassword: oldPassword,
                 newPassword: newPassword
             };
-            return $http.post(orderly.getServiceUrl() + 'system/password', data);
+            return $http.put(orderly.getServiceUrl() + 'system/password', data);
         },
         regeneratePassword: function(emailAddress, securityQuestionType, securityQuestionAnswer) {
             return $http.post(orderly.getServiceUrl() + 'system/password', 

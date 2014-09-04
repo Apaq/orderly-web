@@ -1,0 +1,40 @@
+<div class="row no-padding no-margin profile-view">
+    <div class="col-sm-12">
+        <h1>Din profil</h1>
+        <tabset>
+            <tab heading="Personlige oplysninger">
+                <person-form person="context.user"></person-form>
+                <button class="btn btn-default">Gem</button>
+            </tab>
+            <tab heading="Kodeord">
+                <p>Du kan her ændre dit kodeord ved først at indtaste dit nuværende kodeord og derefter dit nye.</p>
+                <form class="form-horizontal">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="inputOldPassword" class="col-lg-2 control-label">Nuværende kodeord</label>
+                            <div class="col-lg-10">
+                                <input type="password" class="form-control" id="inputUsername" ng-model="newPasswordRequest.oldPassword">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputNewPassword" class="col-lg-2 control-label">Nyt kodeord</label>
+                            <div class="col-lg-10">
+                                <input type="password" class="form-control" id="inputNewPassword" ng-model="newPasswordRequest.newPassword">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="inputRepeatPassword" class="col-lg-2 control-label">Gentag nyt kodeord</label>
+                            <div class="col-lg-10">
+                                <input type="password" class="form-control" id="inputRepeatPassword" ng-model="newPasswordRequest.newPassword2">
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+                <button class="btn btn-default" ng-click="changePassword()">Ændr kodeord</button>
+            </tab>
+        </tabset>
+
+    </div>
+</div>
