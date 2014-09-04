@@ -1,7 +1,7 @@
 function OrderlyProvider() {
     'use strict';
     /* SERVICEURL START */
-    var serviceUrl = "http://192.168.87.114:8084/";
+    var serviceUrl = "http://192.168.87.104:8084/";
     /* SERVICEURL END */
 
     this.setServiceUrl = function (url) {
@@ -74,6 +74,25 @@ function SystemSvc($http, orderly, $q) {
                 newPassword: newPassword
             };
             return $http.post(orderly.getServiceUrl() + 'system/password', data);
+        },
+        regeneratePassword: function(emailAddress, securityQuestionType, securityQuestionAnswer) {
+            return $http.post(orderly.getServiceUrl() + 'system/password', 
+                             {emailAddress: emailAddress, 
+                              securityQuestionType: securityQuestionType, 
+                              securityQuestionAnswer:securityQuestionAnswer}).then(function(response) {
+                if(response.status >= 400) {
+                    throw response.data.message;
+                }
+                return;
+            });
+        },
+        getSecurityQuestionType: function(emailAddress) {
+            return $http.get(orderly.getServiceUrl() + 'system/securityQuestions/' + escape(emailAddress) + '/type').then(function(response) {
+                if(response.status >= 400) {
+                    throw "Mail Address is not registered";
+                }
+                return angular.fromJson(response.data);
+            });
         },
         changeUserRole: function(userId, newRole) {
             return $http.post(orderly.getServiceUrl() + 'system/users/' + userId + '/role', newRole);

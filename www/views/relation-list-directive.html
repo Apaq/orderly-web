@@ -32,7 +32,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="relation in relations" ng-click="edit(relation)">
+                    <tr ng-repeat="relation in relations | orderBy:'person.firstName'" ng-click="edit(relation)">
                         <td>
                             <img class="img-circle" src="http://best.aau.dk//wp-content/uploads/2014/02/unknown-avatar.png" width="32" height="32">
                         </td>

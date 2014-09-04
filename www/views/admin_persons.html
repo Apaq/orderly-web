@@ -25,7 +25,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="person in persons" ng-click="editPerson(person)">
+                    <tr ng-repeat="person in persons | orderBy:'firstName'" ng-click="editPerson(person)">
                         <td>
                             <img class="img-circle" src="http://best.aau.dk//wp-content/uploads/2014/02/unknown-avatar.png" width="16" height="16">
                         </td>

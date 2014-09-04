@@ -24,7 +24,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="domain in domains" ng-click="editDomain(domain)">
+                    <tr ng-repeat="domain in domains | orderBy:'name'" ng-click="editDomain(domain)">
                         <td>
                             {{domain.name}}
                         </td>

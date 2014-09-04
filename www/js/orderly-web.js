@@ -27,6 +27,10 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             templateUrl: 'views/login.html',
             controller: 'LoginController'
         })
+        .when('/forgot-password', {
+            templateUrl: 'views/newpassword.html',
+            controller: 'NewPasswordController'
+        })
         .when('/admin/domains', {
             templateUrl: 'views/admin_domains.html',
             controller: 'AdminDomainListController'
@@ -73,16 +77,52 @@ function MenuController($scope, $location, LoginSvc, $route) {
 }
 
 function LoginController($scope, LoginSvc, $location, $log, $animate) {
+    $scope.loggingIn = false;
     $scope.login = function () {
+        $scope.loggingIn = true;
         LoginSvc.authenticate($scope.user, $scope.pass, $scope.rememberMe).then(function () {
             $location.path('/calendar');
         }, function(reason) {
+            $scope.loggingIn = false;
             $log.info("Error while authenticating: " + reason);
             var el = angular.element('#loginform-wrapper');
             $animate.addClass(el, 'invalid-login', function() {
                 $animate.removeClass(el, 'invalid-login');
             });
         });
+    };
+    
+    $scope.requestPassword = function() {
+        $location.path('/forgot-password');
+    };
+}
+
+function NewPasswordController($scope, SystemSvc) {
+    $scope.step = 1;
+    $scope.changingStep = false;
+    $scope.data = {
+        emailAddress: ''
+    };
+    
+    $scope.next = function () {
+        switch($scope.step) {
+            case 1:
+                SystemSvc.getSecurityQuestionType($scope.data.emailAddress).then(function(securityQuestionType) {
+                    $scope.data.securityQuestionType = securityQuestionType;
+                    $scope.step = 2;
+                }, function(reason) {
+                    alert(reason);
+                });
+                break;
+            case 2: 
+                SystemSvc.regeneratePassword($scope.data.emailAddress, $scope.data.securityQuestionType, $scope.data.securityQuestionAnswer).then(function() {
+                    $scope.step = 3;
+                }, function(reason) {
+                    alert(reason);
+                });
+                break;
+                
+        }
     };
 }
 
@@ -762,6 +802,7 @@ function WitnessingFormDirective() {
 angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.calendar', 'ui.bootstrap'])
     .config(AppConfig)
     .controller('LoginController', LoginController)
+    .controller('NewPasswordController', NewPasswordController)
     .controller('MenuController', MenuController)
     .controller('RelationListController', RelationListController)
     .controller('CalendarController', CalendarController)

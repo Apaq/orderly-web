@@ -57,7 +57,7 @@
                     </li>
                     <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons">Personer</a>
                     </li>
-                    <li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')"><a href="#/settings">Indstillinger</a>
+                    <li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')>=0"><a href="#/settings">Indstillinger</a>
                     </li>
                 </ul>
 
