@@ -622,20 +622,36 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
 
     $scope.addEvent = function (date, jsEvent, view) {
         if($scope._canEdit()) {
+            var modalInstance = $modal.open({
+            templateUrl: 'views/event-template-picker.html',
+            controller: function($scope, $modalInstance) {
+                $scope.data = {eventType:'FieldServiceMeeting'};
+                
+                $scope.ok = function () {
+                    $modalInstance.close($scope.data.eventType);
+                };
+
+                $scope.cancel = function () {
+                    $modalInstance.dismiss('cancel');
+                };
+            }
+        });
+
+        modalInstance.result.then(function (eventType) {
             var startTime = new Date(date.getTime());
-            var endTime = new Date(date.getTime());
-
             startTime.setHours(10);
-            endTime.setHours(10);
-            endTime.setMinutes(15);
-
-            var type = 'FieldServiceMeeting';
-            var event = angular.copy($scope.eventTemplates[type]);
+            
+            var event = angular.copy($scope.eventTemplates[eventType]);
             event.domain.id = $scope.context.relation.domain.id;
             event.startTime = startTime;
-            //event.endTime = endTime;
+            
+            EventSvc.save(event).$promise.then(function (event) {
+                $scope.open('lg', event);
+            });
 
-            $scope.open('lg', event);
+            
+        });
+
         } else {
             alert("Du har ikke tilladelse til at oprette nye begivenheder.");
         }
@@ -883,6 +899,40 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
                         ]
                     }
                 ]
+            },
+            PublicWitnessing: {
+                "domain": {
+                    "id": null,
+                },
+                "startTime": null,
+                "endTime": null,
+                "type": "PublicWitnessing",
+                "agendas": [
+                    {
+                        "tasks": [
+                            {
+                                "type": "Witnessing",
+                                "duration": 120
+                            },
+                            {
+                                "type": "Witnessing",
+                                "duration": 120
+                            },
+                            {
+                                "type": "Witnessing",
+                                "duration": 120
+                            },
+                            {
+                                "type": "Witnessing",
+                                "duration": 120
+                            },
+                            {
+                                "type": "Witnessing",
+                                "duration": 120
+                            }
+                        ]
+                    }
+                ]
             }
         };
 
@@ -904,8 +954,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
 
 
         $rootScope.context = {};
-
-
+        
         $rootScope.$on("login", function (event, user) {
             $rootScope.context.user = user;
             $rootScope.context.relations = PersonSvc.relations({

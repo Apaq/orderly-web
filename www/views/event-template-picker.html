@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <div class="row">
+        <div class="col-sm-6">
+            <h3 class="modal-title">Opret begivenhed</h3>
+        </div>
+        <div class="col-sm-6">
+        </div>
+    </div>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-12">
+            Vælg den type af begivenhed du vil oprette:
+            <div class="radio" ng-repeat="type in ['FieldServiceMeeting', 'PublicWitnessing']">
+                <label>
+                    <input type="radio" ng-model="data.eventType" value="{{type}}">{{eventTypes[type]}}
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+</div>
+

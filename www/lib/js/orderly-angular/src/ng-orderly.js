@@ -105,7 +105,7 @@ function SystemSvc($http, orderly, $q) {
 }
 
 function PersonSvc($resource, orderly) {
-    return $resource(orderly.getServiceUrl() + 'persons/:id', null, {
+    return $resource(orderly.getServiceUrl() + 'persons/:id', null,  {
         'relations': {
             method: 'GET',
             url: orderly.getServiceUrl() + 'persons/:id/relations',
@@ -123,6 +123,7 @@ function EventSvc($resource, orderly) {
         'update': {
             method: 'PUT'
         }
+        
     });
 }
 

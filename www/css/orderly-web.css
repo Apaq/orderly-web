@@ -2,6 +2,10 @@ body {
     padding-top: 45px;
 }
 
+.nav-pills li > a > .glyphicon {
+    margin-top: 3px;
+}
+
 .expose-icon-when-disabled > .icon-wrapper {
     display: inline-block;
     opacity: 0;

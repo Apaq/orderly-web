@@ -18,12 +18,13 @@
                         <h1 style="text-align:center">{{date | date:'MMMM yyyy'}}</h1>
                     </div>
                     <div class="col-sm-4">
-                        <div class="btn-group pull-right" dropdown is-open="status.isopen">
+                        <div class="btn-group pull-right" dropdown>
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" ng-disabled="disabled">
                                 Udskriv <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a ng-click="print('FieldServiceMeeting')">Samlingsplan</a></li>
+                                <li><a ng-click="print('FieldServiceMeeting')">Samlingsplan</a>
+                                </li>
 
                             </ul>
                         </div>
@@ -38,5 +39,5 @@
         </div>
 
     </div>
-    
+
 </div>

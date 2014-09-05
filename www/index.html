@@ -53,21 +53,28 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div ng-if="context.user" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav" ng-if="context.mode==='domain'">
-                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/calendar">Kalender</a></li>
-                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons">Personer</a></li>
+                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/calendar">Kalender</a>
+                    </li>
+                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons">Personer</a>
+                    </li>
                     <!--li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')>=0"><a href="#/settings">Indstillinger</a>
                     </li-->
                 </ul>
 
                 <ul class="nav navbar-nav" ng-if="context.mode==='admin'">
-                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/admin/domains">Domæner</a></li>
-                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/admin/persons">Personer</a></li>
-                    <li ng-class="{active:currentArea() === 'settings'}"><a href="#/admin/settings">Indstillinger</a></li>
+                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/admin/domains">Domæner</a>
+                    </li>
+                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/admin/persons">Personer</a>
+                    </li>
+                    <li ng-class="{active:currentArea() === 'settings'}"><a href="#/admin/settings">Indstillinger</a>
+                    </li>
                 </ul>
-                
+
                 <ul class="nav navbar-nav" ng-if="context.mode==='profile'">
-                    <li ng-class="{active:currentArea() === 'information'}"><a href="#/profile">Personlige informationer</a></li>
-                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/profile/">Sikkerhed</a></li>
+                    <li ng-class="{active:currentArea() === 'information'}"><a href="#/profile">Personlige informationer</a>
+                    </li>
+                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/profile/">Sikkerhed</a>
+                    </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
@@ -79,8 +86,10 @@
                             <li ng-repeat="relation in context.relations"><a ng-click="selectDomain(relation)">{{relation.domain.name}}</a>
                             </li>
                             <li class="divider"></li>
-                            <li ng-if="context.user.role==='Admin'"><a ng-click="selectAdminMode()">Admin</a></li>
-                            <li><a ng-click="selectProfile()">Profil</a></li>
+                            <li ng-if="context.user.role==='Admin'"><a ng-click="selectAdminMode()">Admin</a>
+                            </li>
+                            <li><a ng-click="selectProfile()">Profil</a>
+                            </li>
                             <li class="divider"></li>
                             <li><a ng-click="logout()">Log ud</a>
                             </li>
@@ -99,6 +108,9 @@
         <p>Please use a newer browser. We recommend Google Chrome: <a href="https://www.google.com/chrome">https://www.google.com/chrome</a></p>
     <![endif]-->
     <!--[if gt IE 9]><!-->
+    
+
+    
     <div class="container-fluid" ng-view></div>
     <!--<![endif]-->
 

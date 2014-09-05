@@ -21,7 +21,12 @@
         <div class="col-sm-4">
             <ul class="nav nav-pills nav-stacked" style="max-width: 300px;">
                 <li ng-repeat="task in selection.agenda.tasks" ng-class="{active:(selection.task.id===task.id)}">
-                    <a ng-click="selection.task=task">{{taskTypes[task.type]}}</a>
+                    
+                    <a ng-click="selection.task=task">
+                        <span class="glyphicon glyphicon-remove-sign pull-right"></span>
+                        {{taskTypes[task.type]}}
+                    </a>
+                    
                 </li>
             </ul>
         </div>
