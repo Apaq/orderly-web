@@ -20,8 +20,7 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             controller: 'CalendarController'
         })
         .when('/persons', {
-            templateUrl: 'views/relations.html',
-            controller: 'RelationListController'
+            templateUrl: 'views/relations.html'
         })
         .when('/login', {
             templateUrl: 'views/login.html',
@@ -325,10 +324,6 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
     $scope._load();
 }
 
-function RelationListController($scope, PersonSvc, RelationSvc) {
-
-}
-
 function RelationController($scope, $log, relation, domain, RelationSvc, PersonSvc, $modalInstance) {
     $scope.relation = relation;
     $scope.person = relation.person;
@@ -429,7 +424,7 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     };
 }
 
-function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale) {
+function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale, $http) {
 
     $scope.currentRange = null;
     
@@ -534,7 +529,8 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             EventSvc.query({
                 domain: $scope.context.relation.domain.id,
                 from: start,
-                to: end
+                to: end,
+                mode: 'full'
             }).$promise.then(function (events) {
                 $scope.currentRange = {
                     start: start,
@@ -573,6 +569,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.onDrop = function (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
         var orgEvent = event.orgEvent;
         orgEvent.startTime.setDate(orgEvent.startTime.getDate() + dayDelta);
+        orgEvent.startTime.setMinutes(orgEvent.startTime.getMinutes() + minuteDelta);
         EventSvc.save({
             id: orgEvent.id
         }, orgEvent).$promise.then(null, function (reason) {
@@ -583,11 +580,6 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
 
     $scope.updateDate = function (view, element) {
         $scope.date = $scope.calendarObj.fullCalendar('getDate');
-    };
-
-    /* alert on Resize */
-    $scope.alertOnResize = function (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) {
-        $scope.alertMessage = ('Event Resized to make dayDelta ' + minuteDelta);
     };
 
     /* Change View */
@@ -613,10 +605,19 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
         $scope.calendarObj.fullCalendar('prev');
     };
 
-    $scope._renderEvent = function (event, element) {
-        //                element.attr('tabindex', '0');
-        //                element.attr('ng-keypress', 'onKeyPress($event)');
-        //                element.attr('unselectable', 'off');
+    $scope._renderEvent = function (event, element, view) {
+        event = event.orgEvent;
+        var singleAgenda = event.agendas.length === 1;
+        var singleTask = singleAgenda && event.agendas[0].tasks.length === 1;
+        var singleAssignment = singleTask && event.agendas[0].tasks[0].assignments.length === 1;
+        
+        var singleAssignmentAssignee = singleAssignment && event.agendas[0].tasks[0].assignments[0].assignee; 
+        
+        if(singleAssignmentAssignee) {
+            var name = singleAssignmentAssignee.firstName + ' ' + singleAssignmentAssignee.lastName;
+            element.find('.fc-event-inner').append('<span class="fc-event-title"> - ' + name + '</span>');
+        }
+        return element;
     };
 
 
@@ -641,13 +642,15 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             var startTime = new Date(date.getTime());
             startTime.setHours(10);
             
-            var event = angular.copy($scope.eventTemplates[eventType]);
-            event.domain.id = $scope.context.relation.domain.id;
-            event.startTime = startTime;
-            
-            EventSvc.save(event).$promise.then(function (event) {
-                $scope.open('lg', event);
+            $http.get('event-templates/' + eventType +'.json').success(function(event) {
+                event.domain.id = $scope.context.relation.domain.id;
+                event.startTime = startTime;
+
+                EventSvc.save(event).$promise.then(function (event) {
+                    $scope.open('lg', event);
+                });
             });
+            
 
             
         });
@@ -671,7 +674,6 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             editable: true,
             eventClick: $scope.onEventClick,
             eventDrop: $scope.onDrop,
-            eventResize: $scope.alertOnResize,
             viewRender: $scope.updateDate,
             dayClick: $scope.addEvent,
             eventRender: $scope._renderEvent,
@@ -687,7 +689,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.eventSources2 = [$scope.calEventsExt, $scope.eventsF, $scope.events];
 }
 
-function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q) {
+function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q, $rootScope) {
     return {
         restrict: 'E',
         scope: {
@@ -751,7 +753,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q) {
 
                 }, function (reason) {
                     if (reason === 'delete') {
-                        if (scope.relation.person.enabled) {
+                        if ($rootScope.context.relation.domain.type !== 'Congregation' || relation.person.enabled) {
                             if (confirm("Remove relation to user from the current domain?")) {
                                 RelationSvc.remove({
                                     domain: scope.domain.id,
@@ -786,7 +788,7 @@ function PersonFormDirective() {
     };
 }
 
-function FieldServiceMeetingFormDirective() {
+function TaskEditorDirective() {
     return {
         restrict: 'E',
         scope: {
@@ -795,49 +797,41 @@ function FieldServiceMeetingFormDirective() {
             readonly: '='
         },
         link: function (scope, element, attrs) {
-            if (!scope.task.assignments || scope.task.assignments.length === 0) {
-                scope.task.assignments = [{
-                    type: 'Conductor',
-                    assignee: {
-                        id: null
-                    }
-                }];
-            }
-
-        },
-        templateUrl: 'views/field-service-meeting-directive.html'
-    };
-}
-
-function WitnessingFormDirective() {
-    return {
-        restrict: 'E',
-        scope: {
-            task: '=',
-            persons: '=',
-            readonly: '='
-        },
-        link: function (scope, element, attrs) {
-            if (!scope.task.assignments || scope.task.assignments.length === 0) {
-                scope.task.assignments = [{
-                    type: 'Conductor',
-                    assignee: {
-                        id: null
-                    }
-                }];
-            }
+            var i;
             
-            if (scope.task.assignments.length < 2) {
-                scope.task.assignments.push({
-                    type: 'Assistant',
-                    assignee: {
-                        id: null
-                    }
-                });
-            }
+            scope.initTask = function() {
+                scope.hasConductor = scope.task.type !== 'Song';
+                scope.hasAssistent = ['WatchtowerStudy', 'BibleStudy', 'SchoolAssignment', 'SchoolReview','Witnessing'].indexOf(scope.task.type) >= 0;
+                scope.isSong = scope.task.type === 'Song';
+
+                scope.songs = [];
+                for(i = 1;i<=135;i++) {
+                    scope.songs.push(i.toString());
+                }
+
+                if (scope.hasConductor && (!scope.task.assignments || scope.task.assignments.length === 0)) {
+                    scope.task.assignments = [{
+                        type: 'Conductor',
+                        assignee: {
+                            id: null
+                        }
+                    }];
+                }
+
+                if (scope.hasAssistent && scope.task.assignments.length < 2) {
+                    scope.task.assignments.push({
+                        type: 'Assistant',
+                        assignee: {
+                            id: null
+                        }
+                    });
+                }
+            };
+            
+            scope.$watch('task', scope.initTask);
 
         },
-        templateUrl: 'views/witnessing-directive.html'
+        templateUrl: 'views/task-editor-directive.html'
     };
 }
 
@@ -847,14 +841,12 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .controller('NewPasswordController', NewPasswordController)
     .controller('ProfileController', ProfileController)
     .controller('MenuController', MenuController)
-    .controller('RelationListController', RelationListController)
     .controller('CalendarController', CalendarController)
     .controller('AdminDomainListController', AdminDomainListController)
     .controller('AdminPersonListController', AdminPersonListController)
     .directive('relationList', RelationListDirective)
     .directive('personForm', PersonFormDirective)
-    .directive('fieldServiceMeeting', FieldServiceMeetingFormDirective)
-    .directive('witnessing', WitnessingFormDirective)
+    .directive('taskEditor', TaskEditorDirective)
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
@@ -878,62 +870,6 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
             ManageSound: 'Mikser',
             ManagePlatform: 'Platform',
             Cleaning: 'Rengøring'
-        };
-
-
-        $rootScope.eventTemplates = {
-            FieldServiceMeeting: {
-                "domain": {
-                    "id": null,
-                },
-                "startTime": null,
-                "endTime": null,
-                "type": "FieldServiceMeeting",
-                "agendas": [
-                    {
-                        "tasks": [
-                            {
-                                "type": "FieldServiceMeeting",
-                                "duration": 15
-                            }
-                        ]
-                    }
-                ]
-            },
-            PublicWitnessing: {
-                "domain": {
-                    "id": null,
-                },
-                "startTime": null,
-                "endTime": null,
-                "type": "PublicWitnessing",
-                "agendas": [
-                    {
-                        "tasks": [
-                            {
-                                "type": "Witnessing",
-                                "duration": 120
-                            },
-                            {
-                                "type": "Witnessing",
-                                "duration": 120
-                            },
-                            {
-                                "type": "Witnessing",
-                                "duration": 120
-                            },
-                            {
-                                "type": "Witnessing",
-                                "duration": 120
-                            },
-                            {
-                                "type": "Witnessing",
-                                "duration": 120
-                            }
-                        ]
-                    }
-                ]
-            }
         };
 
         $rootScope.relationRoles = {

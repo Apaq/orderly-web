@@ -1,0 +1,63 @@
+{
+    "domain": {
+        "id": null
+    },
+    "startTime": null,
+    "endTime": null,
+    "type": "CongregationMeeting",
+    "agendas": [
+        {
+            "tasks": [
+                {
+                    "type": "Song",
+                    "duration": 3
+                },
+                {
+                    "type": "Prayer",
+                    "duration": 2
+                },
+                {
+                    "type": "BibleStudy",
+                    "duration": 30
+                },
+                {
+                    "type": "BibleReading",
+                    "duration": 10
+                },
+                {
+                    "type": "SchoolAssignment",
+                    "duration": 6
+                },
+                {
+                    "type": "SchoolAssignment",
+                    "duration": 7
+                },
+                {
+                    "type": "SchoolAssignment",
+                    "duration": 7
+                },
+                {
+                    "type": "Song",
+                    "duration": 3
+                },
+                {
+                    "type": "Talk",
+                    "duration": 15
+                },
+                {
+                    "type": "Talk",
+                    "duration": 15
+                },
+                {
+                    "type": "Song",
+                    "duration": 3
+                },
+                {
+                    "type": "Prayer",
+                    "duration": 2
+                }
+                
+            ]
+        }
+    ]
+}

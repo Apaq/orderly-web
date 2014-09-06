@@ -1,0 +1,18 @@
+{
+    "domain": {
+        "id": null
+    },
+    "startTime": null,
+    "endTime": null,
+    "type": "FieldServiceMeeting",
+    "agendas": [
+        {
+            "tasks": [
+                {
+                    "type": "FieldServiceMeeting",
+                    "duration": 15
+                }
+            ]
+        }
+    ]
+}

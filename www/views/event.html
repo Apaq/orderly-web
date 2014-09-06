@@ -31,8 +31,9 @@
             </ul>
         </div>
         <div class="col-sm-8 well">
-            <field-service-meeting ng-if="selection.task.type==='FieldServiceMeeting'" task="selection.task" persons="persons" readonly="readonly"></field-service-meeting>
-            <witnessing ng-if="selection.task.type==='Witnessing'" task="selection.task" persons="persons" readonly="readonly"></witnessing>
+            <task-editor task="selection.task" persons="persons" readonly="readonly"></task-editor>
+            <!--single-conductor ng-if="['FieldServiceMeeting', 'Prayer', 'Talk', 'BibleReading'].indexOf(selection.task.type) >= 0" task="selection.task" persons="persons" readonly="readonly"></single-conductor>
+            <witnessing ng-if="selection.task.type==='Witnessing'" task="selection.task" persons="persons" readonly="readonly"></witnessing-->
         </div>
     </div>
 
