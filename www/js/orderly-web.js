@@ -1,6 +1,6 @@
 /*global angular*/
 function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProvider) {
-    //orderlyProvider.setServiceUrl('http://orderlyservice-apaq.rhcloud.com/');
+    orderlyProvider.setServiceUrl('http://orderlyservice-apaq.rhcloud.com/');
 
     // SECURITY (forward to login if not authorized)
     $httpProvider.interceptors.push(function ($location) {
