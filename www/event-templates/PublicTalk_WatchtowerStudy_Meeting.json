@@ -1,0 +1,43 @@
+{
+    "domain": {
+        "id": null
+    },
+    "startTime": null,
+    "endTime": null,
+    "type": "CongregationMeeting",
+    "agendas": [
+        {
+            "tasks": [
+                {
+                    "type": "Song",
+                    "duration": 3
+                },
+                {
+                    "type": "Prayer",
+                    "duration": 2
+                },
+                {
+                    "type": "PublicTalk",
+                    "duration": 30
+                },
+                {
+                    "type": "Song",
+                    "duration": 3
+                },
+                {
+                    "type": "WatchtowerStudy",
+                    "duration": 60
+                },
+                {
+                    "type": "Song",
+                    "duration": 3
+                },
+                {
+                    "type": "Prayer",
+                    "duration": 2
+                }
+                
+            ]
+        }
+    ]
+}

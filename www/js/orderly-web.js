@@ -851,7 +851,9 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
             CongregationMeeting: 'Møde',
-            PublicWitnessing: 'Offentlig forkyndelse'
+            PublicWitnessing: 'Offentlig forkyndelse',
+            Study_School_Service_Meeting: 'Studie, Teokratisk Skole og Tjenestemøde',
+            PublicTalk_WatchtowerStudy_Meeting: 'Offentligt foredrag og Vagttårnsstudie'
         };
 
         $rootScope.taskTypes = {
@@ -859,8 +861,8 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
             Song: 'Sang',
             Prayer: 'Bøn',
             Talk: 'Foredrag',
-            Public_Talk: 'Offentligt foredrag',
-            Watchtower_Study: 'Vagttårnsstudie',
+            PublicTalk: 'Offentligt foredrag',
+            WatchtowerStudy: 'Vagttårnsstudie',
             BibleStudy: 'Menighedsbibelstudie',
             BibleReading: 'Bibellæsning',
             SchoolBibleRecitation: 'BibelOplæsning',

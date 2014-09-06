@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-sm-12">
             Vælg den type af begivenhed du vil oprette:
-            <div class="radio" ng-repeat="type in ['FieldServiceMeeting', 'PublicWitnessing', 'CongregationMeeting']">
+            <div class="radio" ng-repeat="type in ['FieldServiceMeeting', 'PublicWitnessing', 'Study_School_Service_Meeting', 'PublicTalk_WatchtowerStudy_Meeting']">
                 <label>
                     <input type="radio" ng-model="data.eventType" value="{{type}}">{{eventTypes[type]}}
                 </label>
