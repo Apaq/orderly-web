@@ -16,11 +16,11 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 
     $routeProvider
         .when('/calendar', {
-            templateUrl: 'views/calendar.html',
+            templateUrl: 'views/domain/calendar.html',
             controller: 'CalendarController'
         })
         .when('/persons', {
-            templateUrl: 'views/relations.html'
+            templateUrl: 'views/domain/relations.html'
         })
         .when('/login', {
             templateUrl: 'views/login.html',
@@ -31,16 +31,24 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
             controller: 'NewPasswordController'
         })
         .when('/admin/domains', {
-            templateUrl: 'views/admin_domains.html',
+            templateUrl: 'views/admin/domains.html',
             controller: 'AdminDomainListController'
         })
         .when('/admin/persons', {
-            templateUrl: 'views/admin_persons.html',
+            templateUrl: 'views/admin/persons.html',
             controller: 'AdminPersonListController'
         })
+        .when('/assignments', {
+            templateUrl: 'views/profile/assignments.html',
+            controller: 'AssignmentController'
+        })
         .when('/profile', {
-            templateUrl: 'views/profile.html',
+            templateUrl: 'views/profile/profile.html',
             controller: 'ProfileController'
+        })
+        .when('/password', {
+            templateUrl: 'views/profile/password.html',
+            controller: 'PasswordController'
         })
         .otherwise({
             redirectTo: '/login'
@@ -67,7 +75,7 @@ function MenuController($scope, $location, LoginSvc, $route) {
     $scope.selectProfile = function () {
         delete $scope.context.relation;
         $scope.context.mode = 'profile';
-        $location.path('/profile');
+        $location.path('/assignments');
         $route.reload();
     };
 
@@ -137,7 +145,12 @@ function NewPasswordController($scope, SystemSvc) {
     };
 }
 
-function ProfileController($scope, SystemSvc) {
+function ProfileController($scope) {
+    $scope.person = null;
+    
+}
+
+function PasswordController($scope, SystemSvc) {
     $scope.person = null;
     $scope.newPasswordRequest = {oldPassword:'', newPassword:'', newPassword2:''};
     $scope.changePassword = function() {
@@ -149,6 +162,10 @@ function ProfileController($scope, SystemSvc) {
             alert("Password changed");
         });
     };
+}
+
+function AssignmentController($scope, AssignmentSvc){
+    $scope.tasks = AssignmentSvc.query({pid:$scope.context.user.id})
 }
 
 function EntityEditorController($scope, entity, $modalInstance) {
@@ -190,7 +207,7 @@ function AdminDomainListController($scope, DomainSvc, $modal, $log) {
     $scope._open = function (domain) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/domain.html',
+            templateUrl: 'views/admin/domain.html',
             controller: EntityEditorController,
             size: 'md',
             resolve: {
@@ -220,7 +237,7 @@ function AdminDomainListController($scope, DomainSvc, $modal, $log) {
     $scope._openRelations = function (domain) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/admin_domain-relations.html',
+            templateUrl: 'views/admin/domain-relations.html',
             controller: function ($scope, $modalInstance, domain) {
                 $scope.domain = domain;
                 $scope.close = function () {
@@ -262,7 +279,7 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
         $scope._open = function (person) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/admin_change-credentials.html',
+            templateUrl: 'views/admin/change-credentials.html',
             controller: AdminChangeCredentialsController,
             size: 'md',
             resolve: {
@@ -294,7 +311,7 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
     $scope._open = function (person) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/admin_person.html',
+            templateUrl: 'views/admin/person.html',
             controller: EntityEditorController,
             size: 'md',
             resolve: {
@@ -441,7 +458,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.open = function (size, event, readonly) {
 
         var modalInstance = $modal.open({
-            templateUrl: 'views/event.html',
+            templateUrl: 'views/domain/event.html',
             controller: EventController,
             size: size,
             resolve: {
@@ -624,7 +641,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     $scope.addEvent = function (date, jsEvent, view) {
         if($scope._canEdit()) {
             var modalInstance = $modal.open({
-            templateUrl: 'views/event-template-picker.html',
+            templateUrl: 'views/domain/event-template-picker.html',
             controller: function($scope, $modalInstance) {
                 $scope.data = {eventType:'FieldServiceMeeting'};
                 
@@ -724,7 +741,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q, $rootSc
             scope._open = function (relation) {
 
                 var modalInstance = $modal.open({
-                    templateUrl: 'views/relation.html',
+                    templateUrl: 'views/directives/relation.html',
                     controller: RelationController,
                     size: 'md',
                     resolve: {
@@ -774,7 +791,7 @@ function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q, $rootSc
 
             scope._load();
         },
-        templateUrl: 'views/relation-list-directive.html'
+        templateUrl: 'views/directives/relation-list.html'
     };
 }
 
@@ -784,7 +801,7 @@ function PersonFormDirective() {
         scope: {
             person: '='
         },
-        templateUrl: 'views/person-form-directive.html'
+        templateUrl: 'views/directives/person-form.html'
     };
 }
 
@@ -831,7 +848,7 @@ function TaskEditorDirective() {
             scope.$watch('task', scope.initTask);
 
         },
-        templateUrl: 'views/task-editor-directive.html'
+        templateUrl: 'views/directives/task-editor.html'
     };
 }
 
@@ -840,6 +857,8 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .controller('LoginController', LoginController)
     .controller('NewPasswordController', NewPasswordController)
     .controller('ProfileController', ProfileController)
+    .controller('PasswordController', PasswordController)
+    .controller('AssignmentController', AssignmentController)
     .controller('MenuController', MenuController)
     .controller('CalendarController', CalendarController)
     .controller('AdminDomainListController', AdminDomainListController)

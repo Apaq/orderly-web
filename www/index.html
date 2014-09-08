@@ -71,9 +71,11 @@
                 </ul>
 
                 <ul class="nav navbar-nav" ng-if="context.mode==='profile'">
-                    <li ng-class="{active:currentArea() === 'information'}"><a href="#/profile">Personlige informationer</a>
+                    <li ng-class="{active:currentArea() === 'assignments'}"><a href="#/assignments">Opgaver</a>
                     </li>
-                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/profile/">Sikkerhed</a>
+                   <li ng-class="{active:currentArea() === 'information'}"><a href="#/profile">Personlige informationer</a>
+                    </li>
+                    <li ng-class="{active:currentArea() === 'security'}"><a href="#/password/">Sikkerhed</a>
                     </li>
                 </ul>
 
