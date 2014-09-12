@@ -114,8 +114,8 @@ function PersonSvc($resource, orderly) {
     });
 }
 
-function AssignmentSvc($resource, orderly) {
-    return $resource(orderly.getServiceUrl() + 'persons/:pid/assignments/:id');
+function TaskSvc($resource, orderly) {
+    return $resource(orderly.getServiceUrl() + 'tasks/:id');
 }
 
 function EventSvc($resource, orderly) {
@@ -212,7 +212,7 @@ angular.module('orderly.services', ['ngResource', 'LocalStorageModule'])
     .config(Config)
     .factory({
         'PersonSvc': PersonSvc,
-        'AssignmentSvc': AssignmentSvc,
+        'TaskSvc': TaskSvc,
         'EventSvc': EventSvc,
         'LoginSvc': LoginSvc,
         'RelationSvc': RelationSvc,
