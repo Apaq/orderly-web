@@ -848,6 +848,14 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('personForm', PersonFormDirective)
     .directive('taskEditor', TaskEditorDirective)
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
+        $rootScope.securityQuestionTypes = {
+            FirstPet: "Hvad var navnet på dit først kæledyr?",
+            FirstTeacher: "Hvad var navnet på din først lærer?",
+            MomsMaidenName:"Hvad var din mors ungpigenavn?",
+            FavoriteCountryToVisit: "Hvilket land vil du helst besøge?",
+            LastNameOfSecondGradeTeacher: "Hvad var efternavnet på din klasselærer i 2. klasse?"
+        };
+        
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
             CongregationMeeting: 'Møde',
