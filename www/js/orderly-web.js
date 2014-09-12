@@ -806,7 +806,7 @@ function PersonFormDirective() {
     };
 }
 
-function TaskEditorDirective() {
+function TaskEditorDirective(TaskSvc, $filter) {
     return {
         restrict: 'E',
         scope: {
@@ -821,6 +821,13 @@ function TaskEditorDirective() {
                 scope.hasConductor = scope.task.type !== 'Song';
                 scope.hasAssistent = ['WatchtowerStudy', 'BibleStudy', 'SchoolAssignment', 'SchoolReview','Witnessing'].indexOf(scope.task.type) >= 0;
                 scope.isSong = scope.task.type === 'Song';
+                
+                scope.personIds = [];
+                angular.forEach(scope.persons, function(person) {
+                    scope.personIds.push(person.id);
+                });
+                
+                scope.assignments = TaskSvc.query({persons: scope.personIds, type:scope.task.type, mode:'singularity', order:'desc'});
 
                 scope.songs = [];
                 for(i = 1;i<=135;i++) {
@@ -845,11 +852,39 @@ function TaskEditorDirective() {
                     });
                 }
             };
+
+            scope.generateTitle = function(person) {
+                var title = person.firstName+' '+person.lastName;
+                if(person.lastAssignmentStartTime) {
+                    title += ' (' + $filter('date')(person.lastAssignmentStartTime, 'shortDate') + ')';
+                }
+                return title;
+            };
             
             scope.$watch('task', scope.initTask);
+            scope.$watch('persons', scope.initTask);
+            scope.$watch('persons.$resolved', scope.initTask);
+            //scope.$watch('assignments.$resolved', scope.initTask);
 
         },
         templateUrl: 'views/directives/task-editor.html'
+    };
+}
+
+function LastAssignmentDateFilter() {
+    return function(input, assignments) {
+        if(assignments) {
+            angular.forEach(input, function(person) {
+                angular.forEach(assignments, function(task) {
+                    angular.forEach(task.assignments, function(assignment) {
+                        if(assignment.assignee.id === person.id) {
+                            person.lastAssignmentStartTime = task.startTime;
+                        }
+                    });
+                });
+          });
+        }
+        return input;
     };
 }
 
@@ -867,6 +902,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('relationList', RelationListDirective)
     .directive('personForm', PersonFormDirective)
     .directive('taskEditor', TaskEditorDirective)
+    .filter('lastAssignmentDate', LastAssignmentDateFilter)
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
         $rootScope.securityQuestionTypes = {
             FirstPet: "Hvad var navnet på dit først kæledyr?",
