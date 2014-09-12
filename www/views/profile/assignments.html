@@ -21,7 +21,7 @@
                 <tbody>
                     <tr ng-repeat="task in tasks" ng-click="editPerson(person)">
                         <td>
-                            {{task.agenda.event.startTime | date:'short'}}
+                            {{task.startTime | date:'short'}}
                         </td>
                         <td>
                             {{taskTypes[task.type]}}

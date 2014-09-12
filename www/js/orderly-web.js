@@ -1,6 +1,7 @@
 /*global angular*/
 function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProvider) {
-    orderlyProvider.setServiceUrl('http://146.185.167.121/');
+    //orderlyProvider.setServiceUrl('http://146.185.167.121/');
+    orderlyProvider.setServiceUrl('http://localhost:8084/');
 
     // SECURITY (forward to login if not authorized)
     $httpProvider.interceptors.push(function ($location) {
@@ -164,8 +165,8 @@ function PasswordController($scope, SystemSvc) {
     };
 }
 
-function AssignmentController($scope, AssignmentSvc){
-    $scope.tasks = AssignmentSvc.query({pid:$scope.context.user.id})
+function AssignmentController($scope, TaskSvc){
+    $scope.tasks = TaskSvc.query({persons:[$scope.context.user.id]});
 }
 
 function EntityEditorController($scope, entity, $modalInstance) {
