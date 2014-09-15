@@ -72,7 +72,7 @@ function MenuController($scope, $location, LoginSvc, $route) {
         $location.path('/admin/domains');
         $route.reload();
     };
-    
+
     $scope.selectProfile = function () {
         delete $scope.context.relation;
         $scope.context.mode = 'profile';
@@ -102,17 +102,17 @@ function LoginController($scope, LoginSvc, $location, $log, $animate) {
         $scope.loggingIn = true;
         LoginSvc.authenticate($scope.user, $scope.pass, $scope.rememberMe).then(function () {
             $location.path('/calendar');
-        }, function(reason) {
+        }, function (reason) {
             $scope.loggingIn = false;
             $log.info("Error while authenticating: " + reason);
             var el = angular.element('#loginform-wrapper');
-            $animate.addClass(el, 'invalid-login', function() {
+            $animate.addClass(el, 'invalid-login', function () {
                 $animate.removeClass(el, 'invalid-login');
             });
         });
     };
-    
-    $scope.requestPassword = function() {
+
+    $scope.requestPassword = function () {
         $location.path('/forgot-password');
     };
 }
@@ -123,50 +123,56 @@ function NewPasswordController($scope, SystemSvc) {
     $scope.data = {
         emailAddress: ''
     };
-    
+
     $scope.next = function () {
-        switch($scope.step) {
-            case 1:
-                SystemSvc.getSecurityQuestionType($scope.data.emailAddress).then(function(securityQuestionType) {
-                    $scope.data.securityQuestionType = securityQuestionType;
-                    $scope.step = 2;
-                }, function(reason) {
-                    alert(reason);
-                });
-                break;
-            case 2: 
-                SystemSvc.regeneratePassword($scope.data.emailAddress, $scope.data.securityQuestionType, $scope.data.securityQuestionAnswer).then(function() {
-                    $scope.step = 3;
-                }, function(reason) {
-                    alert(reason);
-                });
-                break;
-                
+        switch ($scope.step) {
+        case 1:
+            SystemSvc.getSecurityQuestionType($scope.data.emailAddress).then(function (securityQuestionType) {
+                $scope.data.securityQuestionType = securityQuestionType;
+                $scope.step = 2;
+            }, function (reason) {
+                alert(reason);
+            });
+            break;
+        case 2:
+            SystemSvc.regeneratePassword($scope.data.emailAddress, $scope.data.securityQuestionType, $scope.data.securityQuestionAnswer).then(function () {
+                $scope.step = 3;
+            }, function (reason) {
+                alert(reason);
+            });
+            break;
+
         }
     };
 }
 
 function ProfileController($scope) {
     $scope.person = null;
-    
+
 }
 
 function PasswordController($scope, SystemSvc) {
     $scope.person = null;
-    $scope.newPasswordRequest = {oldPassword:'', newPassword:'', newPassword2:''};
-    $scope.changePassword = function() {
-        if($scope.newPasswordRequest.newPassword !== $scope.newPasswordRequest.newPassword2) {
+    $scope.newPasswordRequest = {
+        oldPassword: '',
+        newPassword: '',
+        newPassword2: ''
+    };
+    $scope.changePassword = function () {
+        if ($scope.newPasswordRequest.newPassword !== $scope.newPasswordRequest.newPassword2) {
             alert("The passwords does not match");
             return;
         }
-        SystemSvc.changePassword($scope.newPasswordRequest.oldPassword, $scope.newPasswordRequest.newPassword).then(function() {
+        SystemSvc.changePassword($scope.newPasswordRequest.oldPassword, $scope.newPasswordRequest.newPassword).then(function () {
             alert("Password changed");
         });
     };
 }
 
-function AssignmentController($scope, TaskSvc){
-    $scope.tasks = TaskSvc.query({persons:[$scope.context.user.id]});
+function AssignmentController($scope, TaskSvc) {
+    $scope.tasks = TaskSvc.query({
+        persons: [$scope.context.user.id]
+    });
 }
 
 function EntityEditorController($scope, entity, $modalInstance) {
@@ -275,37 +281,37 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
             sex: 'Male'
         });
     };
-    
-    $scope.changeCredentials = function(person) {
+
+    $scope.changeCredentials = function (person) {
         $scope._open = function (person) {
 
-        var modalInstance = $modal.open({
-            templateUrl: 'views/admin/change-credentials.html',
-            controller: AdminChangeCredentialsController,
-            size: 'md',
-            resolve: {
-                entity: function () {
-                    return person;
+            var modalInstance = $modal.open({
+                templateUrl: 'views/admin/change-credentials.html',
+                controller: AdminChangeCredentialsController,
+                size: 'md',
+                resolve: {
+                    entity: function () {
+                        return person;
+                    }
                 }
-            }
-        });
+            });
 
-        modalInstance.result.then(function (person) {
-            PersonSvc.save({
-                id: person.id
-            }, person).$promise.then($scope._load);
+            modalInstance.result.then(function (person) {
+                PersonSvc.save({
+                    id: person.id
+                }, person).$promise.then($scope._load);
 
-        }, function (reason) {
-            if (reason === 'delete') {
-                if (confirm("Are you sure you want to delete the person?")) {
-                    PersonSvc.remove({
-                        id: person.id
-                    }).$promise.then($scope._load);
+            }, function (reason) {
+                if (reason === 'delete') {
+                    if (confirm("Are you sure you want to delete the person?")) {
+                        PersonSvc.remove({
+                            id: person.id
+                        }).$promise.then($scope._load);
+                    }
                 }
-            }
-            $log.info('Modal dismissed at: ' + new Date());
-        });
-    };
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
 
     };
 
@@ -386,22 +392,29 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     $scope.edit = {};
     $scope.selection = {};
 
-    // INIT
-    if ($scope.event.agendas && $scope.event.agendas.length > 0) {
-        $scope.selection.agenda = $scope.event.agendas[0];
-    } else {
-        $scope.selection.agenda = null;
-    }
+    $scope.selectTask = function (task) {
+        $scope.selection.task = task;
+    };
 
-    if ($scope.selection.agenda !== null && $scope.selection.agenda.tasks && $scope.selection.agenda.tasks.length) {
-        $scope.selection.task = $scope.selection.agenda.tasks[0];
-    } else {
-        $scope.selection.task = null;
+    // INIT
+    $scope.init = function () {
+        if ($scope.event.agendas && $scope.event.agendas.length > 0) {
+            $scope.selection.agenda = $scope.event.agendas[0];
+        } else {
+            $scope.selection.agenda = null;
+        }
+
+        if ($scope.selection.agenda !== null && $scope.selection.agenda.tasks && $scope.selection.agenda.tasks.length) {
+            $scope.selectTask($scope.selection.agenda.tasks[0]);
+        } else {
+            $scope.selectTask($scope.selection.task = null);
+        }
     }
 
     $scope.persons = PersonSvc.query({
         domain: $scope.context.relation.domain.id
     });
+    $scope.persons.$promise.then($scope.init);
 
     $scope.edit.time = new Date($scope.event.startTime.getTime());
 
@@ -418,10 +431,6 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
 
 
     // FUNCTIONS
-    $scope.alert = function (text) {
-        alert(text);
-        return false;
-    };
 
     $scope.ok = function () {
         $modalInstance.close($scope.event);
@@ -440,16 +449,18 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
             });
         }
     };
+
+    $scope.init();
 }
 
 function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale, $http) {
 
     $scope.currentRange = null;
-    
-    $scope._canEdit = function() {
+
+    $scope._canEdit = function () {
         var result = false;
-        angular.forEach($scope.context.relation.roles, function(role) {
-            if(role === 'Coordinator') {
+        angular.forEach($scope.context.relation.roles, function (role) {
+            if (role === 'Coordinator') {
                 result = true;
             }
         });
@@ -466,7 +477,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
                 event: function () {
                     return event;
                 },
-                readonly: function() {
+                readonly: function () {
                     return readonly === true;
                 }
             }
@@ -488,7 +499,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
     };
 
     $scope.print = function (type) {
-        
+
         // First get all events
         EventSvc.query({
             domain: $scope.context.relation.domain.id,
@@ -501,10 +512,10 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
             var pdf = new jsPDF('p', 'pt', 'a4'),
                 src, data = [],
                 margins;
-            
+
             pdf.setLineWidth(1).setFontSize(20);
             pdf.text("Samlinger for " + $scope.context.relation.domain.name, 30, 60);
-            
+
             pdf.setLineWidth(1).setFontSize(14);
             margins = {
                 left: 60,
@@ -628,10 +639,10 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
         var singleAgenda = event.agendas.length === 1;
         var singleTask = singleAgenda && event.agendas[0].tasks.length === 1;
         var singleAssignment = singleTask && event.agendas[0].tasks[0].assignments.length === 1;
-        
-        var singleAssignmentAssignee = singleAssignment && event.agendas[0].tasks[0].assignments[0].assignee; 
-        
-        if(singleAssignmentAssignee) {
+
+        var singleAssignmentAssignee = singleAssignment && event.agendas[0].tasks[0].assignments[0].assignee;
+
+        if (singleAssignmentAssignee) {
             var name = singleAssignmentAssignee.firstName + ' ' + singleAssignmentAssignee.lastName;
             element.find('.fc-event-inner').append('<span class="fc-event-title"> - ' + name + '</span>');
         }
@@ -640,38 +651,40 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
 
 
     $scope.addEvent = function (date, jsEvent, view) {
-        if($scope._canEdit()) {
+        if ($scope._canEdit()) {
             var modalInstance = $modal.open({
-            templateUrl: 'views/domain/event-template-picker.html',
-            controller: function($scope, $modalInstance) {
-                $scope.data = {eventType:'FieldServiceMeeting'};
-                
-                $scope.ok = function () {
-                    $modalInstance.close($scope.data.eventType);
-                };
+                templateUrl: 'views/domain/event-template-picker.html',
+                controller: function ($scope, $modalInstance) {
+                    $scope.data = {
+                        eventType: 'FieldServiceMeeting'
+                    };
 
-                $scope.cancel = function () {
-                    $modalInstance.dismiss('cancel');
-                };
-            }
-        });
+                    $scope.ok = function () {
+                        $modalInstance.close($scope.data.eventType);
+                    };
 
-        modalInstance.result.then(function (eventType) {
-            var startTime = new Date(date.getTime());
-            startTime.setHours(10);
-            
-            $http.get('event-templates/' + eventType +'.json').success(function(event) {
-                event.domain.id = $scope.context.relation.domain.id;
-                event.startTime = startTime;
-
-                EventSvc.save(event).$promise.then(function (event) {
-                    $scope.open('lg', event);
-                });
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
             });
-            
 
-            
-        });
+            modalInstance.result.then(function (eventType) {
+                var startTime = new Date(date.getTime());
+                startTime.setHours(10);
+
+                $http.get('event-templates/' + eventType + '.json').success(function (event) {
+                    event.domain.id = $scope.context.relation.domain.id;
+                    event.startTime = startTime;
+
+                    EventSvc.save(event).$promise.then(function (event) {
+                        $scope.open('lg', event);
+                    });
+                });
+
+
+
+            });
 
         } else {
             alert("Du har ikke tilladelse til at oprette nye begivenheder.");
@@ -816,21 +829,25 @@ function TaskEditorDirective(TaskSvc, $filter) {
         },
         link: function (scope, element, attrs) {
             var i;
-            
-            scope.initTask = function() {
+            scope.historicsAssignmentsType = null;
+            scope.historicAssignments = null;
+
+            scope.initTask = function () {
+                if (!scope.task) {
+                    return;
+                }
+
                 scope.hasConductor = scope.task.type !== 'Song';
-                scope.hasAssistent = ['WatchtowerStudy', 'BibleStudy', 'SchoolAssignment', 'SchoolReview','Witnessing'].indexOf(scope.task.type) >= 0;
+                scope.hasAssistent = ['WatchtowerStudy', 'BibleStudy', 'SchoolAssignment', 'SchoolReview', 'Witnessing'].indexOf(scope.task.type) >= 0;
                 scope.isSong = scope.task.type === 'Song';
-                
+
                 scope.personIds = [];
-                angular.forEach(scope.persons, function(person) {
+                angular.forEach(scope.persons, function (person) {
                     scope.personIds.push(person.id);
                 });
-                
-                scope.assignments = TaskSvc.query({persons: scope.personIds, type:scope.task.type, mode:'singularity', order:'desc'});
 
                 scope.songs = [];
-                for(i = 1;i<=135;i++) {
+                for (i = 1; i <= 135; i++) {
                     scope.songs.push(i.toString());
                 }
 
@@ -851,16 +868,45 @@ function TaskEditorDirective(TaskSvc, $filter) {
                         }
                     });
                 }
+
+                // We are gonna decorate the list of persons for each assignment list so we need copies for each
+                scope.personLists = [];
+                for (i = 0; i < scope.task.assignments.length; i++) {
+                    scope.personLists[i] = angular.copy(scope.persons);
+                }
+
+                if (scope.historicsAssignmentsType !== scope.task.type) {
+                    scope.historyAssignmentsType = scope.task.type;
+                    scope.historicAssignments = TaskSvc.query({
+                        persons: scope.personIds,
+                        taskType: scope.task.type,
+                        mode: 'singularity',
+                        order: 'desc'
+                    });
+                    scope.historicAssignments.$promise.then(function (tasks) {
+
+                        angular.forEach(tasks, function (task) {
+                            angular.forEach(task.assignments, function (assignment, index) {
+                                angular.forEach(scope.personLists[index], function (person) {
+                                    if (assignment.assignee.id === person.id && assignment.type === assignment.type) {
+                                        person.lastAssignmentStartTime = task.startTime;
+                                    }
+                                });
+                            });
+                        });
+                    });
+
+                }
             };
 
-            scope.generateTitle = function(person) {
-                var title = person.firstName+' '+person.lastName;
-                if(person.lastAssignmentStartTime) {
+            scope.generateTitle = function (person) {
+                var title = person.firstName + ' ' + person.lastName;
+                if (person.lastAssignmentStartTime) {
                     title += ' (' + $filter('date')(person.lastAssignmentStartTime, 'shortDate') + ')';
                 }
                 return title;
             };
-            
+
             scope.$watch('task', scope.initTask);
             scope.$watch('persons', scope.initTask);
             scope.$watch('persons.$resolved', scope.initTask);
@@ -872,19 +918,25 @@ function TaskEditorDirective(TaskSvc, $filter) {
 }
 
 function LastAssignmentDateFilter() {
-    return function(input, assignments) {
-        if(assignments) {
-            angular.forEach(input, function(person) {
-                angular.forEach(assignments, function(task) {
-                    angular.forEach(task.assignments, function(assignment) {
-                        if(assignment.assignee.id === person.id) {
+    return function (input, assignments, assignmentType) {
+        var output;
+        if (assignments) {
+            output = [];
+            angular.forEach(input, function (person) {
+                person = angular.copy(person);
+                output.push(person);
+                angular.forEach(assignments, function (task) {
+                    angular.forEach(task.assignments, function (assignment) {
+                        if (assignment.assignee.id === person.id && assignment.type === assignmentType) {
                             person.lastAssignmentStartTime = task.startTime;
                         }
                     });
                 });
-          });
+            });
+        } else {
+            output = input;
         }
-        return input;
+        return output;
     };
 }
 
@@ -907,11 +959,11 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
         $rootScope.securityQuestionTypes = {
             FirstPet: "Hvad var navnet på dit først kæledyr?",
             FirstTeacher: "Hvad var navnet på din først lærer?",
-            MomsMaidenName:"Hvad var din mors ungpigenavn?",
+            MomsMaidenName: "Hvad var din mors ungpigenavn?",
             FavoriteCountryToVisit: "Hvilket land vil du helst besøge?",
             LastNameOfSecondGradeTeacher: "Hvad var efternavnet på din klasselærer i 2. klasse?"
         };
-        
+
         $rootScope.eventTypes = {
             FieldServiceMeeting: 'Samling',
             CongregationMeeting: 'Møde',
@@ -956,7 +1008,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
 
 
         $rootScope.context = {};
-        
+
         $rootScope.$on("login", function (event, user) {
             $rootScope.context.user = user;
             $rootScope.context.relations = PersonSvc.relations({
@@ -978,10 +1030,10 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
             $location.path('/login');
         });
 
-        LoginSvc.authenticate().then(function() {
+        LoginSvc.authenticate().then(function () {
             $location.path('/calendar');
-        }, function() {
+        }, function () {
             $location.path('/login');
         });
-        
+
     });
