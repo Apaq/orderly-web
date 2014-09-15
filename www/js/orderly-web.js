@@ -829,7 +829,7 @@ function TaskEditorDirective(TaskSvc, $filter) {
         },
         link: function (scope, element, attrs) {
             var i;
-            scope.historicsAssignmentsType = null;
+            scope.historicAssignmentsType = null;
             scope.historicAssignments = null;
 
             scope.initTask = function () {
@@ -840,11 +840,6 @@ function TaskEditorDirective(TaskSvc, $filter) {
                 scope.hasConductor = scope.task.type !== 'Song';
                 scope.hasAssistent = ['WatchtowerStudy', 'BibleStudy', 'SchoolAssignment', 'SchoolReview', 'Witnessing'].indexOf(scope.task.type) >= 0;
                 scope.isSong = scope.task.type === 'Song';
-
-                scope.personIds = [];
-                angular.forEach(scope.persons, function (person) {
-                    scope.personIds.push(person.id);
-                });
 
                 scope.songs = [];
                 for (i = 1; i <= 135; i++) {
@@ -868,34 +863,44 @@ function TaskEditorDirective(TaskSvc, $filter) {
                         }
                     });
                 }
-
-                // We are gonna decorate the list of persons for each assignment list so we need copies for each
-                scope.personLists = [];
-                for (i = 0; i < scope.task.assignments.length; i++) {
-                    scope.personLists[i] = angular.copy(scope.persons);
-                }
-
-                if (scope.historicsAssignmentsType !== scope.task.type) {
-                    scope.historyAssignmentsType = scope.task.type;
-                    scope.historicAssignments = TaskSvc.query({
-                        persons: scope.personIds,
-                        taskType: scope.task.type,
-                        mode: 'singularity',
-                        order: 'desc'
+                
+                if(scope.persons.length >0) {
+                    scope.personIds = [];
+                    angular.forEach(scope.persons, function (person) {
+                        scope.personIds.push(person.id);
                     });
-                    scope.historicAssignments.$promise.then(function (tasks) {
 
+                    // We are gonna decorate the list of persons for each assignment list so we need copies for each
+                    scope.personLists = [];
+                    for (i = 0; i < scope.task.assignments.length; i++) {
+                        scope.personLists[i] = angular.copy(scope.persons);
+                    }
+                    
+                    var updateLastAssignmentDates = function(tasks) {
                         angular.forEach(tasks, function (task) {
-                            angular.forEach(task.assignments, function (assignment, index) {
-                                angular.forEach(scope.personLists[index], function (person) {
-                                    if (assignment.assignee.id === person.id && assignment.type === assignment.type) {
-                                        person.lastAssignmentStartTime = task.startTime;
-                                    }
+                                angular.forEach(task.assignments, function (assignment, index) {
+                                    angular.forEach(scope.personLists[index], function (person) {
+                                        if (assignment.assignee.id === person.id && assignment.type === assignment.type) {
+                                            person.lastAssignmentStartTime = task.startTime;
+                                        }
+                                    });
                                 });
                             });
-                        });
-                    });
+                    };
 
+                    if (scope.historicAssignmentsType !== scope.task.type) {
+                        scope.historicAssignmentsType = scope.task.type;
+                        scope.historicAssignments = TaskSvc.query({
+                            persons: scope.personIds,
+                            taskType: scope.task.type,
+                            mode: 'singularity',
+                            order: 'desc'
+                        });
+                        scope.historicAssignments.$promise.then(updateLastAssignmentDates);
+
+                    } else {
+                        updateLastAssignmentDates(scope.historicAssignments);
+                    }
                 }
             };
 
