@@ -1,3 +1,4 @@
+[
 {
     "domain": {
         "id": null
@@ -25,15 +26,15 @@
                     "duration": 10
                 },
                 {
-                    "type": "SchoolAssignment",
+                    "type": "SchoolStudent1",
                     "duration": 6
                 },
                 {
-                    "type": "SchoolAssignment",
+                    "type": "SchoolStudent2",
                     "duration": 7
                 },
                 {
-                    "type": "SchoolAssignment",
+                    "type": "SchoolStudent3",
                     "duration": 7
                 },
                 {
@@ -61,3 +62,4 @@
         }
     ]
 }
+]
