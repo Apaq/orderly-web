@@ -270,16 +270,22 @@ html .fc,
 	}
 
 .fc-view-month .fc-event {
-	border: 0px; /* default BORDER color */
+	border: 1px solid white; /* default BORDER color */
 	background-color: transparent; /* default BACKGROUND color */
 	color: #000;               /* default TEXT color */
 	font-size: .6em;
 	cursor: default;
 	}
 
+.fc-view-month .fc-event:hover {
+	border: 1px solid #e7e7e7;
+	}
+        
 a.fc-event {
 	text-decoration: none;
 	}
+        
+
 	
 a.fc-event,
 .fc-event-draggable {
