@@ -874,6 +874,11 @@ function TaskEditorDirective(TaskSvc, $filter) {
                     scope.personLists = [];
                     for (i = 0; i < scope.task.assignments.length; i++) {
                         scope.personLists[i] = angular.copy(scope.persons);
+                        
+                        //... and add an empty lastAssignmentStartTime on each one of them
+                        for(e = 0;e<scope.personLists[i].length;e++) {
+                            scope.personLists[i][e].lastAssignmentStartTime = null;
+                        }
                     }
                     
                     var updateLastAssignmentDates = function(tasks) {

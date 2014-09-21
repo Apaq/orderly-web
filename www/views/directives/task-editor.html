@@ -10,25 +10,7 @@
                 
             </div>
         </div>
-        <!--div class="form-group" ng-if="hasConductor">
-            <label for="select" class="col-lg-2 control-label">Leder</label>
-            <div class="col-lg-10">
-                <input type="text" ng-if="readonly" ng-readonly="true" ng-value="task.assignments[0].assignee.firstName + ' ' + task.assignments[0].assignee.lastName">
-                <select  ng-if="!readonly" class="form-control" ng-model="task.assignments[0].assignee.id" ng-options="person.id as generateTitle(person) for person in persons | lastAssignmentDate:historicAssignments[task.assignments[0].type]:task.assignments[0].type | orderBy:['lastAssignmentStartTime', 'firstName', 'lastName']">
-                  <option value="">-- Ingen --</option>
-                </select>
-                
-            </div>
-        </div>
-        <div class="form-group" ng-if="hasAssistent">
-            <label for="select" class="col-lg-2 control-label">Assistent</label>
-            <div class="col-lg-10">
-                <input type="text" ng-if="readonly" ng-readonly="true" ng-value="task.assignments[1].assignee.firstName + ' ' + task.assignments[1].assignee.lastName">
-                <select  ng-if="!readonly" class="form-control" ng-model="task.assignments[1].assignee.id" ng-options="person.id as generateTitle(person) for person in persons | orderBy:['firstName', 'lastName']">
-                  <option value="">-- Ingen --</option>
-                </select>
-            </div>
-        </div-->
+
         <div class="form-group" ng-if="isSong">
             <label for="select" class="col-lg-2 control-label">Sangnr.</label>
             <div class="col-lg-10">
