@@ -1,7 +1,7 @@
 <div class="modal-header">
     <div class="row">
         <div class="col-sm-6">
-            <h3 class="modal-title">Opret begivenhed</h3>
+            <h3 class="modal-title" translate="EVENT.TEMPLATE_PICKER.TITLE"></h3>
         </div>
         <div class="col-sm-6">
         </div>
@@ -10,7 +10,7 @@
 <div class="modal-body">
     <div class="row">
         <div class="col-sm-12">
-            Vælg den type af begivenhed du vil oprette:
+            {{'EVENT.TEMPLATE_PICKER.CHOOSE_EVENT' | translate}}:
             <div class="radio" ng-repeat="type in ['FieldServiceMeeting', 'PublicWitnessing', 'Study_School_Service_Meeting', 'PublicTalk_WatchtowerStudy_Meeting']">
                 <label>
                     <input type="radio" ng-model="data.eventType" value="{{type}}">{{'EVENT_TYPES.' + type | translate}}
@@ -22,7 +22,7 @@
 
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" ng-click="ok()">OK</button>
-    <button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+    <button class="btn btn-primary" ng-click="ok()" translate="EVENT.TEMPLATE_PICKER.OK"></button>
+    <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.TEMPLATE_PICKER.CANCEL"></button>
 </div>
 

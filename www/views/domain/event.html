@@ -1,13 +1,13 @@
 <div class="modal-header">
     <div class="row">
         <div class="col-sm-6">
-            <h3 class="modal-title">{{'EVENT_TYPES.' + event.type | translate}}</h3>
+            <h3 class="modal-title">{{'EVENT.EDITOR.TYPES.' + event.type | translate}}</h3>
         </div>
         <div class="col-sm-6">
 
             <div class="form-inline">
                 <div class="form-group pull-right">
-                    <label class="control-label" for="inputSuccess4">Starttidspunkt:</label>
+                    <label class="control-label" for="inputSuccess4">{{'EVENT.EDITOR.START_TIME' | translate}}:</label>
                     <input type="time" class="form-control input-sm" ng-model="edit.time" ng-readonly="readonly">
                 </div>
 
@@ -36,20 +36,20 @@
     </div>
 
     <div class="row" ng-if="selection.task === null">
-        <h2 class="text-center">Ingen opgaver i begivenheden</h2>
-        <h6 class="taxt-center"><a>Opret opgave <i class="glyphicon glyphicon-plus"></i></a></h6>
+        <h2 class="text-center" translate="EVENT.EDITOR.NO_TASKS"></h2>
+        <h6 class="taxt-center"><a>{{'EVENT.EDITOR.CREATE_TASK' | translate}} <i class="glyphicon glyphicon-plus"></i></a></h6>
     </div>
 
 
 
 </div>
 <div class="modal-footer" ng-if="!readonly">
-    <button class="btn btn-primary" ng-click="ok()">OK</button>
-    <button class="btn btn-warning" ng-click="cancel()">Annuller</button>
+    <button class="btn btn-primary" ng-click="ok()" translate="EVENT.EDITOR.OK">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.EDITOR.CANCEL">Annuller</button>
 
-    <button class="btn btn-danger" ng-click="delete()">Slet</button>
+    <button class="btn btn-danger" ng-click="delete()" translate="EVENT.EDITOR.DELETE">Slet</button>
 </div>
 <div class="modal-footer" ng-if="readonly">
-    <button class="btn btn-warning" ng-click="cancel()">Luk</button>
+    <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.EDITOR.CLOSE">Luk</button>
 </div>
 

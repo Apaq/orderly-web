@@ -18,14 +18,54 @@
         }
             
     },
+    "MENU": {
+        "CALENDAR": "@:GENERAL.CALENDAR",
+        "PERSONS": "@:GENERAL.PERSONS",
+        "DOMAINS": "@:GENERAL.DOMAINS",
+        "SETTINGS": "@:GENERAL.SETTINGS",
+        "ASSIGNMENTS": "@:GENERAL.ASSIGNMENTS",
+        "PERSONAL_INFORMATION": "Personlige informationer",
+        "SECURITY": "@:GENERAL.SECURITY",
+        "ADMIN": "@:GENERAL.ADMIN",
+        "PROFILE": "@:GENERAL.PROFILE",
+        "LOG_OUT": "@:GENERAL.LOG_OUT"
+    },
+    "EVENT": {
+        "EDITOR": {
+            "START_TIME": "Starttidspunkt",
+            "NO_TASKS": "Ingen opgaver i begivenheden",
+            "CREATE_TASK": "Opret opgave",
+            "OK": "@:GENERAL.OK",
+            "CANCEL": "@:GENERAL.CANCEL",
+            "DELETE": "@:GENERAL.DELETE",
+            "CLOSE": "@:GENERAL.CLOSE"
+        },
+        "TEMPLATE_PICKER": {
+            "TITLE": "Opret begivenhed",
+            "CHOOSE_EVENT": "Vælg den type af begivenhed du vil oprette",
+            "OK": "@:GENERAL.OK",
+            "CANCEL": "@:GENERAL.CANCEL"
+        }
+    },
     "GENERAL": {
         "OK": "Ok",
         "CANCEL": "Annullér",
+        "DELETE": "Slet",
+        "CLOSE": "Luk",
         "EMAIL_ADDRESS": "Emailadresse",
         "NEXT": "Næste",
         "PREVIOUS": "Forrige",
         "QUESTION": "Spørgsmål",
-        "ANSWER": "Svar"
+        "ANSWER": "Svar",
+        "CALENDAR": "Kalender",
+        "PERSONS": "Personer",
+        "DOMAINS": "Domæner",
+        "SETTINGS": "Indstillinger",
+        "ASSIGNMENTS": "Opgaver",
+        "SECURITY": "Sikkerhed",
+        "ADMIN": "Admin",
+        "PROFILE": "Profil",
+        "LOG_OUT": "Log ud"
     },
     "EVENT_TYPES": {
         "FieldServiceMeeting": "Samling",

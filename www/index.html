@@ -55,47 +55,47 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div ng-if="context.user" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav" ng-if="context.mode==='domain'">
-                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/calendar">Kalender</a>
+                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/calendar" translate="MENU.CALENDAR"></a>
                     </li>
-                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons">Personer</a>
+                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons" translate="MENU.PERSONS"></a>
                     </li>
                     <!--li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')>=0"><a href="#/settings">Indstillinger</a>
                     </li-->
                 </ul>
 
                 <ul class="nav navbar-nav" ng-if="context.mode==='admin'">
-                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/admin/domains">Domæner</a>
+                    <li ng-class="{active:currentArea() === 'calendar'}"><a href="#/admin/domains" translate="MENU.DOMAINS">r</a>
                     </li>
-                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/admin/persons">Personer</a>
+                    <li ng-class="{active:currentArea() === 'persons'}"><a href="#/admin/persons" translate="MENU.PERSONS"></a>
                     </li>
-                    <li ng-class="{active:currentArea() === 'settings'}"><a href="#/admin/settings">Indstillinger</a>
+                    <li ng-class="{active:currentArea() === 'settings'}"><a href="#/admin/settings" translate="MENU.SETTINGS"></a>
                     </li>
                 </ul>
 
                 <ul class="nav navbar-nav" ng-if="context.mode==='profile'">
-                    <li ng-class="{active:currentArea() === 'assignments'}"><a href="#/assignments">Opgaver</a>
+                    <li ng-class="{active:currentArea() === 'assignments'}"><a href="#/assignments" translate="MENU.ASSIGNMENTS"></a>
                     </li>
-                   <li ng-class="{active:currentArea() === 'information'}"><a href="#/profile">Personlige informationer</a>
+                   <li ng-class="{active:currentArea() === 'information'}"><a href="#/profile" translate="MENU.PERSONAL_INFORMATION"></a>
                     </li>
-                    <li ng-class="{active:currentArea() === 'security'}"><a href="#/password/">Sikkerhed</a>
+                    <li ng-class="{active:currentArea() === 'security'}"><a href="#/password/" translate="MENU.SECURITY">Sikkerhed</a>
                     </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='domain'">{{context.relation.domain.name}}<span class="caret"></span></a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='admin'">Admin<span class="caret"></span></a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='profile'">Profil<span class="caret"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='admin'">{{'MENU.ADMIN' | translate}}<span class="caret"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='profile'">{{'MENU.PROFILE' | translate}}<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li ng-repeat="relation in context.relations"><a ng-click="selectDomain(relation)">{{relation.domain.name}}</a>
                             </li>
                             <li class="divider"></li>
-                            <li ng-if="context.user.role==='Admin'"><a ng-click="selectAdminMode()">Admin</a>
+                            <li ng-if="context.user.role==='Admin'"><a ng-click="selectAdminMode()" translate="MENU.ADMIN"></a>
                             </li>
-                            <li><a ng-click="selectProfile()">Profil</a>
+                            <li><a ng-click="selectProfile()" translate="MENU.PROFILE"></a>
                             </li>
                             <li class="divider"></li>
-                            <li><a ng-click="logout()">Log ud</a>
+                            <li><a ng-click="logout()" translate="MENU.LOG_OUT"></a>
                             </li>
                         </ul>
                     </li>
