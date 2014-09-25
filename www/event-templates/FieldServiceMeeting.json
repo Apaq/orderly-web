@@ -10,7 +10,12 @@
             "tasks": [
                 {
                     "type": "FieldServiceMeeting",
-                    "duration": 15
+                    "duration": 15,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        }
+                    ]
                 }
             ]
         }

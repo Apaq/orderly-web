@@ -3,21 +3,21 @@
         <h1>Login</h1>
         <form id="loginform">
             <div class="form-group">
-                <label for="login-username" translate="LOGIN.USERNAME" class="ng-scope">Username</label>
+                <label for="login-username" translate="LOGIN.USERNAME" class="ng-scope"></label>
                 <input type="text" class="form-control" ng-model="user">
             </div>
             <div class="form-group">
-                <label for="login-password" translate="LOGIN.PASSWORD">Password</label>
+                <label for="login-password" translate="LOGIN.PASSWORD"></label>
                 <input type="password" class="form-control" ng-model="pass">
             </div>
             <div class="checkbox">
                 <label class="ng-binding">
-                    <input type="checkbox" ng-model="rememberMe">Save on this computer
+                    <input type="checkbox" ng-model="rememberMe">{{'LOGIN.REMEMBER_ME' | translate}}
                 </label>
             </div>
             <button id="button-login" type="submit" ng-click="login()" class="btn btn-primary expose-icon-when-disabled" translate="LOGIN.LOG_IN" ng-disabled="loggingIn">
                 <span class="icon-wrapper"><i class="glyphicon glyphicon-refresh spinning"></i></span>
-                Log in
+                {{'LOGIN.LOG_IN' | translate}}
             </button>
             <button ng-click="requestPassword()" class="btn btn-default" translate="LOGIN.FORGOT_PASSWORD">Forgot Password</button>
         </form>

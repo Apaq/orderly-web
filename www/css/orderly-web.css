@@ -90,6 +90,9 @@ body {
 .no-margin {
     margin: 0 !important;
 }
+.no-margin-bottom {
+    margin-bottom: 0 !important;
+}
 .padding-left {
     padding-left: 15px !important;
 }

@@ -1,7 +1,7 @@
 <form class="form-horizontal">
     <fieldset>
         <div class="form-group" ng-repeat="assignment in task.assignments">
-            <label for="select" class="col-lg-2 control-label">{{assignment.type}}</label>
+            <label for="select" class="col-lg-2 control-label">{{'ASSIGNMENT_TYPES.' + assignment.type | translate}}</label>
             <div class="col-lg-10">
                 <input type="text" ng-if="readonly" ng-readonly="true" ng-value="assignment.assignee.firstName + ' ' + assignment.assignee.lastName">
                 <select  ng-if="!readonly" class="form-control" ng-model="assignment.assignee.id" ng-options="person.id as generateTitle(person) for person in personLists[$index] | orderBy:['lastAssignmentStartTime', 'firstName', 'lastName']">

@@ -8,6 +8,7 @@
     "type": "CongregationMeeting",
     "agendas": [
         {
+            "title": "Møde",
             "tasks": [
                 {
                     "type": "Song",
@@ -15,27 +16,67 @@
                 },
                 {
                     "type": "Prayer",
-                    "duration": 2
+                    "duration": 2,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        }
+                    ]
                 },
                 {
                     "type": "BibleStudy",
-                    "duration": 30
+                    "duration": 30,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        },
+                        {
+                            "type": "Reader"
+                                    
+                        }
+                    ]
                 },
                 {
                     "type": "BibleReading",
-                    "duration": 10
+                    "duration": 10,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        }
+                    ]
                 },
                 {
-                    "type": "SchoolStudent1",
-                    "duration": 6
+                    "type": "SchoolStudent",
+                    "duration": 6,
+                    "assignments": [
+                        {
+                            "type": "Reader"
+                        }
+                    ]
                 },
                 {
-                    "type": "SchoolStudent2",
-                    "duration": 7
+                    "type": "SchoolStudent",
+                    "duration": 7,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        },
+                        {
+                            "type": "Assistant"
+                        }
+                    ]
                 },
                 {
-                    "type": "SchoolStudent3",
-                    "duration": 7
+                    "type": "SchoolStudent",
+                    "duration": 7,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        },
+                        {
+                            "type": "Assistant"
+                        }
+                    ]
                 },
                 {
                     "type": "Song",
@@ -43,11 +84,21 @@
                 },
                 {
                     "type": "Talk",
-                    "duration": 15
+                    "duration": 15,
+                    "assignments": [
+                        {
+                            "type": "Speaker"
+                        }
+                    ]
                 },
                 {
                     "type": "Talk",
-                    "duration": 15
+                    "duration": 15,
+                    "assignments": [
+                        {
+                            "type": "Speaker"
+                        }
+                    ]
                 },
                 {
                     "type": "Song",
@@ -55,9 +106,42 @@
                 },
                 {
                     "type": "Prayer",
-                    "duration": 2
+                    "duration": 2,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        }
+                    ]
                 }
                 
+            ]
+        },
+        {
+            "title": "Mikser",
+            "tasks": [
+                {
+                    "type": "ManageSound",
+                    "duration": 103,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "Platform",
+            "tasks": [
+                {
+                    "type": "ManagePlatform",
+                    "duration": 103,
+                    "assignments": [
+                        {
+                            "type": "Conductor"
+                        }
+                    ]
+                }
             ]
         }
     ]

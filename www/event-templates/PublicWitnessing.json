@@ -10,25 +10,65 @@
             "tasks": [
                 {
                     "type": "Witnessing",
-                    "duration": 120
-                            },
+                    "duration": 120,
+                    "assignments": [
+                        {
+                            "type": "Publisher"
+                        },
+                        {
+                            "type": "Publisher"
+                        }
+                    ]
+                },
                 {
                     "type": "Witnessing",
-                    "duration": 120
-                            },
+                    "duration": 120,
+                    "assignments": [
+                        {
+                            "type": "Publisher"
+                        },
+                        {
+                            "type": "Publisher"
+                        }
+                    ]
+                },
                 {
                     "type": "Witnessing",
-                    "duration": 120
-                            },
+                    "duration": 120,
+                    "assignments": [
+                        {
+                            "type": "Publisher"
+                        },
+                        {
+                            "type": "Publisher"
+                        }
+                    ]
+                },
                 {
                     "type": "Witnessing",
-                    "duration": 120
-                            },
+                    "duration": 120,
+                    "assignments": [
+                        {
+                            "type": "Publisher"
+                        },
+                        {
+                            "type": "Publisher"
+                        }
+                    ]
+                },
                 {
                     "type": "Witnessing",
-                    "duration": 120
-                            }
-                        ]
-                    }
-                ]
+                    "duration": 120,
+                    "assignments": [
+                        {
+                            "type": "Publisher"
+                        },
+                        {
+                            "type": "Publisher"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

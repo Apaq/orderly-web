@@ -1,7 +1,7 @@
 <div class="modal-header">
     <div class="row">
         <div class="col-sm-6">
-            <h3 class="modal-title">{{eventTypes[event.type]}}</h3>
+            <h3 class="modal-title">{{'EVENT_TYPES.' + event.type | translate}}</h3>
         </div>
         <div class="col-sm-6">
 
@@ -24,7 +24,7 @@
                     
                     <a ng-click="selectTask(task)">
                         <span class="glyphicon glyphicon-remove-sign pull-right"></span>
-                        {{taskTypes[task.type]}}
+                        {{'TASK_TYPES.' + task.type | translate}}
                     </a>
                     
                 </li>

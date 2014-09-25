@@ -1,7 +1,13 @@
 /*global angular*/
-function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProvider) {
+function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProvider, $translateProvider) {
     //orderlyProvider.setServiceUrl('http://146.185.167.121/');
     orderlyProvider.setServiceUrl('http://localhost:8084/');
+    
+    $translateProvider.useStaticFilesLoader({
+          prefix: 'js/locale-',
+          suffix: '.json'
+    });
+    $translateProvider.use('da');
 
     // SECURITY (forward to login if not authorized)
     $httpProvider.interceptors.push(function ($location) {
@@ -453,9 +459,11 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     $scope.init();
 }
 
-function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale, $http) {
+function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale, $http, $filter) {
 
+    $scope.view = 'calendar';
     $scope.currentRange = null;
+    $scope.currentEvents = null;
 
     $scope._canEdit = function () {
         var result = false;
@@ -561,6 +569,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
                 to: end,
                 mode: 'full'
             }).$promise.then(function (events) {
+                $scope.currentEvents = events;
                 $scope.currentRange = {
                     start: start,
                     end: end
@@ -568,7 +577,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
                 var tEvents = [];
                 angular.forEach(events, function (event) {
                     tEvents.push({
-                        title: $scope.eventTypes[event.type],
+                        title: $filter('translate')('EVENT_TYPES.' + event.type),
                         start: new Date(event.startTime.getTime()),
                         end: new Date(event.endTime.getTime()),
                         allDay: false,
@@ -580,6 +589,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
                 callback(tEvents);
             });
         } else {
+            $scope.currentEvents = null;
             callback([]);
         }
     };
@@ -819,6 +829,86 @@ function PersonFormDirective() {
     };
 }
 
+function EventTableDirective() {
+    return {
+        restrict: 'E',
+        scope: {
+            event: '='
+        },
+        link: function (scope, element, attrs) {
+            scope.getMaxNumberOfTasks = function() {
+                var count = 0, range, i;
+                angular.forEach(scope.event.agendas, function(agenda) {
+                   if(agenda.tasks.length > count) {
+                       count = agenda.tasks.length;
+                   } 
+                });
+                return count;   
+            }
+            
+            scope.getTaskRange = function() {
+                var count = scope.getMaxNumberOfTasks(), range = [], i;
+                for(i = 0;i<count;i++) {
+                    range.push(i);
+                }
+                return range;
+            }
+            
+            scope.getRowSpan = function(agenda) {
+                var maxTasks = scope.getMaxNumberOfTasks();
+                var result =  parseInt(maxTasks / agenda.tasks.length);
+                return result;
+            }
+            
+            scope.isTaskComplete = function(task) {
+                var i, result = true;
+                if(angular.isArray(task.assignments)) {
+                    for(i=0;i<task.assignments.length;i++) {
+                        if(!task.assignments[i].assignee) {
+                            result = false;
+                            break;
+                        }
+                    }
+                } else {
+                    result = false;
+                }
+                return result;
+            }
+
+            scope.isAgendaComplete = function(agenda) {
+                var i, result = true;
+                if(angular.isArray(agenda.tasks)) {
+                    for(i=0;i<agenda.tasks.length;i++) {
+                        if(!scope.isTaskComplete(agenda.tasks[i])) {
+                            result = false;
+                            break;
+                        }
+                    }
+                } else {
+                    result = false;
+                }
+                return result;
+            }
+    
+            scope.isEventComplete = function(event) {
+                var i, result = true;
+                if(angular.isArray(event.agendas)) {
+                    for(i=0;i<event.agendas.length;i++) {
+                        if(!scope.isAgendaComplete(event.agendas[i])) {
+                            result = false;
+                            break;
+                        }
+                    }
+                } else {
+                    result = false;
+                }
+                return result;
+            }
+        },
+        templateUrl: 'views/directives/event-table.html'
+    };
+}
+
 function TaskEditorDirective(TaskSvc, $filter) {
     return {
         restrict: 'E',
@@ -950,7 +1040,7 @@ function LastAssignmentDateFilter() {
     };
 }
 
-angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.calendar', 'ui.bootstrap'])
+angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.calendar', 'ui.bootstrap', 'pascalprecht.translate'])
     .config(AppConfig)
     .controller('LoginController', LoginController)
     .controller('NewPasswordController', NewPasswordController)
@@ -964,50 +1054,10 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('relationList', RelationListDirective)
     .directive('personForm', PersonFormDirective)
     .directive('taskEditor', TaskEditorDirective)
+    .directive('eventTable', EventTableDirective)
     .filter('lastAssignmentDate', LastAssignmentDateFilter)
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
-        $rootScope.securityQuestionTypes = {
-            FirstPet: "Hvad var navnet på dit først kæledyr?",
-            FirstTeacher: "Hvad var navnet på din først lærer?",
-            MomsMaidenName: "Hvad var din mors ungpigenavn?",
-            FavoriteCountryToVisit: "Hvilket land vil du helst besøge?",
-            LastNameOfSecondGradeTeacher: "Hvad var efternavnet på din klasselærer i 2. klasse?"
-        };
-
-        $rootScope.eventTypes = {
-            FieldServiceMeeting: 'Samling',
-            CongregationMeeting: 'Møde',
-            PublicWitnessing: 'Offentlig forkyndelse',
-            Study_School_Service_Meeting: 'Studie, Teokratisk Skole og Tjenestemøde',
-            PublicTalk_WatchtowerStudy_Meeting: 'Offentligt foredrag og Vagttårnsstudie'
-        };
-
-        $rootScope.taskTypes = {
-            FieldServiceMeeting: 'Samling',
-            Song: 'Sang',
-            Prayer: 'Bøn',
-            Talk: 'Foredrag',
-            PublicTalk: 'Offentligt foredrag',
-            WatchtowerStudy: 'Vagttårnsstudie',
-            BibleStudy: 'Menighedsbibelstudie',
-            BibleReading: 'Bibellæsning',
-            SchoolStudent1: 'Elev nr. 1',
-            SchoolStudent2: 'Elev nr. 2',
-            SchoolStudent3: 'Elev nr. 3',
-            SchoolReview: 'Mundtlig repetition',
-            Witnessing: 'Forkyndelse',
-            ManageSound: 'Mikser',
-            ManagePlatform: 'Platform',
-            Cleaning: 'Rengøring'
-        };
-
-        $rootScope.relationRoles = {
-            Coordinator: "Kordinator",
-            Elder: "Ældste",
-            Secretary: "Sekretær",
-            SchoolOverseer: "Skoletjener",
-            ServiceOverseer: "Tjenestetilsynsmand"
-        };
+        
 
         $rootScope.relationRoleDomainTypes = {
             Coordinator: ['Congregation', 'Circuit', 'Region', 'ServiceGroup', 'ServiceUnit'],
