@@ -1,4 +1,32 @@
 {
+    "FORGOT_PASSWORD": {
+        "STEP_1": {
+            "TITLE": "Generér nyt password",
+            "PAR_1": "For at du kan generere et nyt password, skal du indtaste nogle basale informationer.",
+            "PAR_2": "Indtast venligst først din emailadresse.",
+            "NEXT": "@:GENERAL.NEXT"
+        },
+        "STEP_2": {
+            "TITLE": "Næsten færdig!",
+            "PAR_1": "Tak. Besvar nu venligst the sikkerhedsspørgsmål du oprindeligt valgte da du oprettede din profil.",
+            "NEXT": "@:FORGOT_PASSWORD.STEP_1.TITLE"
+        },
+        "STEP_3": {
+            "TITLE": "Perfekt!",
+            "PAR_1": "Dit password er nu blevet sendt til din email. Check evt. dit spamfilter hvis du ikke får emailen indenfor de næste få minutter.",
+            "NEXT": "Gå til login-siden"
+        }
+            
+    },
+    "GENERAL": {
+        "OK": "Ok",
+        "CANCEL": "Annullér",
+        "EMAIL_ADDRESS": "Emailadresse",
+        "NEXT": "Næste",
+        "PREVIOUS": "Forrige",
+        "QUESTION": "Spørgsmål",
+        "ANSWER": "Svar"
+    },
     "EVENT_TYPES": {
         "FieldServiceMeeting": "Samling",
         "CongregationMeeting": "Møde",

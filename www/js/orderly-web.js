@@ -141,7 +141,7 @@ function NewPasswordController($scope, SystemSvc) {
             });
             break;
         case 2:
-            SystemSvc.regeneratePassword($scope.data.emailAddress, $scope.data.securityQuestionType, $scope.data.securityQuestionAnswer).then(function () {
+            SystemSvc.regeneratePassword($scope.data.emailAddress, $scope.data.securityQuestionAnswer).then(function () {
                 $scope.step = 3;
             }, function (reason) {
                 alert(reason);

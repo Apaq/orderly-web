@@ -75,11 +75,9 @@ function SystemSvc($http, orderly, $q) {
             };
             return $http.put(orderly.getServiceUrl() + 'system/password', data);
         },
-        regeneratePassword: function(emailAddress, securityQuestionType, securityQuestionAnswer) {
+        regeneratePassword: function(emailAddress, securityQuestionAnswer) {
             return $http.post(orderly.getServiceUrl() + 'system/password', 
-                             {emailAddress: emailAddress, 
-                              securityQuestionType: securityQuestionType, 
-                              securityQuestionAnswer:securityQuestionAnswer}).then(function(response) {
+                             {emailAddress: emailAddress, securityQuestionAnswer:securityQuestionAnswer}).then(function(response) {
                 if(response.status >= 400) {
                     throw response.data.message;
                 }
