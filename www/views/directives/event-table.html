@@ -1,0 +1,26 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <strong>{{event.startTime| date:'shortTime'}}: </strong>{{'EVENT_TYPES.' + event.type | translate}} <span ng-if="!isEventComplete(event)" class="glyphicon glyphicon-warning-sign" style="color:red" title="Denne begivenhed er ikke færdiggjort"></span>
+    </div>
+    <table class="table table-bordered">
+        <thead ng-if="event.agendas.length>1">
+            <tr>
+                <th ng-repeat="agenda in event.agendas">
+                    {{agenda.title ? agenda.title : 'Agenda ' +(1+$index)}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="n in getTaskRange()">
+                <td ng-repeat="agenda in event.agendas" rowspan="{{getRowSpan(agenda)}}" ng-if="n<agenda.tasks.length">
+                    <span>
+                        {{agenda.tasks[n].startTime | date:'shortTime'}}: {{'TASK_TYPES.' + agenda.tasks[n].type | translate}}
+                    </span>
+                    <span ng-repeat="assignment in agenda.tasks[n].assignments" class="label" ng-class="{'label-success':assignment.assignee,'label-danger':!assignment.assignee}" style="margin-left:4px">
+                        {{'ASSIGNMENT_TYPES.' + assignment.type | translate}}: {{assignment.assignee ? assignment.assignee.firstName + ' ' + assignment.assignee.lastName: 'Ingen'}}
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
