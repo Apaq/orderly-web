@@ -179,6 +179,16 @@ function AssignmentController($scope, TaskSvc) {
     $scope.tasks = TaskSvc.query({
         persons: [$scope.context.user.id]
     });
+    
+    $scope.getAssignment = function(task, person) {
+        for(var i = 0;i<task.assignments.length;i++) {
+            if(task.assignments[i].assignee && 
+                    task.assignments[i].assignee.id === $scope.context.user.id) {
+                return task.assignments[i];
+            }
+        }
+        return null;
+    }
 }
 
 function AssigneePickerController($scope, persons, task, assignment, $modalInstance, TaskSvc) {

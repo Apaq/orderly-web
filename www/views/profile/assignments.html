@@ -13,21 +13,33 @@
                 <thead>
                     <tr>
                         <th>Tidspunkt</th>
+                        <th>Begivenhed</th>
                         <th>Opgave</th>
+                        <th>Rolle</th>
                         <th>Evt. titel</th>
+                        <th>Evt. lokation</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="task in tasks" ng-click="editPerson(person)">
+                    <tr ng-repeat="task in tasks">
                         <td>
                             {{task.startTime | date:'short'}}
                         </td>
                         <td>
-                            {{taskTypes[task.type]}}
+                            {{'EVENT_TYPES.' + task.agenda.event.type | translate}}
+                        </td>
+                        <td>
+                            {{'TASK_TYPES.' + task.type | translate}}
+                        </td>
+                        <td>
+                            {{'ASSIGNMENT_TYPES.' + getAssignment(task).type | translate}}
                         </td>
                         <td>
                             {{task.meta.title}}
+                        </td>
+                        <td>
+                            {{task.meta.Location}}
                         </td>
                         <td>
                             
