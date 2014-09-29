@@ -16,7 +16,7 @@
                     <span>
                         {{agenda.tasks[n].startTime | date:'shortTime'}}: {{'TASK_TYPES.' + agenda.tasks[n].type | translate}}
                     </span>
-                    <span ng-repeat="assignment in agenda.tasks[n].assignments" class="label" ng-class="{'label-success':assignment.assignee,'label-danger':!assignment.assignee}" style="margin-left:4px">
+                    <span ng-repeat="assignment in agenda.tasks[n].assignments" ng-click="selectAssignee(agenda.tasks[n], assignment)" class="label" ng-class="{'label-success':assignment.assignee,'label-danger':!assignment.assignee}" style="margin-left:4px">
                         {{'ASSIGNMENT_TYPES.' + assignment.type | translate}}: {{assignment.assignee ? assignment.assignee.firstName + ' ' + assignment.assignee.lastName: 'Ingen'}}
                     </span>
                 </td>

@@ -18,18 +18,16 @@
                     "duration": 2,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 },
                 {
                     "type": "PublicTalk",
-                    "duration": 30,
-                    "assignments": [
-                        {
-                            "type": "Speaker"
-                        }
-                    ]
+                    "duration": 30
                 },
                 {
                     "type": "Song",
@@ -40,10 +38,17 @@
                     "duration": 60,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male",
+                                "SuggestedRole": "Elder"
+                            }
                         },
                         {
-                            "type": "Reader"
+                            "type": "Reader",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 },
@@ -56,7 +61,10 @@
                     "duration": 2,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 }
@@ -71,7 +79,10 @@
                     "duration": 103,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedRole": "PlatformManager"
+                            }
                         }
                     ]
                 }
@@ -85,7 +96,10 @@
                     "duration": 103,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedRole": "PlatformManager"
+                            }
                         }
                     ]
                 }

@@ -27,6 +27,11 @@ body {
     -webkit-animation: infinite-spinning  1s infinite linear;
 }
 
+.modal-body > .list-group {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 @keyframes infinite-spinning {
   from {
     transform: rotate(0deg);

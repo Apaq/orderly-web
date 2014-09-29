@@ -1,0 +1,18 @@
+<div class="modal-header">
+    <h3 class="modal-title">Vælg {{'ASSIGNMENT_TYPES.' + assignment.type | translate}} til {{'TASK_TYPES.' + task.type | translate}}</h3>
+</div>
+<div class="modal-body no-padding">
+    <div class="list-group">
+        <a ng-repeat="person in persons | metaSuggestions:assignment.meta | orderBy:['lastAssignmentStartTime', 'firstName', 'lastName']" ng-click="select(person)" class="list-group-item" ng-class="{active:person.id===assignee.id}">
+          <h4 class="list-group-item-heading">{{person.firstName}} {{person.lastName}}</h4>
+          <p ng-if="person.lastAssignmentStartTime" class="list-group-item-text">Sidste gang {{person.lastAssignmentStartTime | date:'shortDate'}}</p>
+          <p ng-if="!person.lastAssignmentStartTime" class="list-group-item-text">Ikke brugt før</p>
+        </a>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()" translate="EVENT.EDITOR.OK">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.EDITOR.CANCEL">Annuller</button>
+</div>
+
+

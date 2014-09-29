@@ -181,6 +181,56 @@ function AssignmentController($scope, TaskSvc) {
     });
 }
 
+function AssigneePickerController($scope, persons, task, assignment, $modalInstance, TaskSvc) {
+    $scope.task = task;
+    $scope.assignment = assignment;
+    $scope.persons = angular.copy(persons);
+    $scope.assignee = null;
+    
+    $scope.personIds = [];
+    angular.forEach($scope.persons, function (person) {
+        $scope.personIds.push(person.id);
+        person.lastAssignmentStartTime = null;
+    });
+    
+    var updateLastAssignmentDates = function(tasks) {
+        angular.forEach(tasks, function (task) {
+                angular.forEach(task.assignments, function (assignment) {
+                    angular.forEach($scope.persons, function (person) {
+                        if (assignment.assignee &&
+                                assignment.assignee.id === person.id && 
+                                $scope.assignment.type === assignment.type && 
+                                $scope.task.type === task.type) {
+                            person.lastAssignmentStartTime = task.startTime;
+                        }
+                    });
+                });
+            });
+    };
+
+
+    $scope.historicAssignments = TaskSvc.query({
+        persons: $scope.personIds,
+        taskType: $scope.task.type,
+        mode: 'singularity',
+        order: 'desc'
+    });
+    $scope.historicAssignments.$promise.then(updateLastAssignmentDates);
+
+
+    $scope.select = function(person) {
+        $scope.assignee = person;
+    };
+
+    $scope.ok = function () {
+        $modalInstance.close($scope.assignee);
+    };
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+}
+
 function EntityEditorController($scope, entity, $modalInstance) {
     $scope.entity = entity;
 
@@ -829,13 +879,17 @@ function PersonFormDirective() {
     };
 }
 
-function EventTableDirective() {
+function EventTableDirective(PersonSvc, EventSvc, $modal) {
     return {
         restrict: 'E',
         scope: {
             event: '='
         },
         link: function (scope, element, attrs) {
+            scope.persons = PersonSvc.query({
+                domain: scope.event.domain.id
+            });
+            
             scope.getMaxNumberOfTasks = function() {
                 var count = 0, range, i;
                 angular.forEach(scope.event.agendas, function(agenda) {
@@ -844,7 +898,7 @@ function EventTableDirective() {
                    } 
                 });
                 return count;   
-            }
+            };
             
             scope.getTaskRange = function() {
                 var count = scope.getMaxNumberOfTasks(), range = [], i;
@@ -852,13 +906,13 @@ function EventTableDirective() {
                     range.push(i);
                 }
                 return range;
-            }
+            };
             
             scope.getRowSpan = function(agenda) {
                 var maxTasks = scope.getMaxNumberOfTasks();
                 var result =  parseInt(maxTasks / agenda.tasks.length);
                 return result;
-            }
+            };
             
             scope.isTaskComplete = function(task) {
                 var i, result = true;
@@ -873,7 +927,7 @@ function EventTableDirective() {
                     result = false;
                 }
                 return result;
-            }
+            };
 
             scope.isAgendaComplete = function(agenda) {
                 var i, result = true;
@@ -888,7 +942,7 @@ function EventTableDirective() {
                     result = false;
                 }
                 return result;
-            }
+            };
     
             scope.isEventComplete = function(event) {
                 var i, result = true;
@@ -903,13 +957,42 @@ function EventTableDirective() {
                     result = false;
                 }
                 return result;
-            }
+            };
+            
+            scope.selectAssignee = function (task, assignment) {
+
+                    var modalInstance = $modal.open({
+                        templateUrl: 'views/domain/assignee-picker.html',
+                        controller: AssigneePickerController,
+                        size: 'md',
+                        resolve: {
+                            task: function () {
+                                return task;
+                            },
+                            persons: function () {
+                                return scope.persons;
+                            },
+                            assignment: function () {
+                                return assignment;
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function (assignee) {
+                        assignment.assignee = assignee;
+                        EventSvc.save({
+                            id: scope.event.id
+                        }, scope.event);
+                    }, function (reason) {
+                        $log.info('Modal dismissed at: ' + new Date());
+                    });
+                };
         },
         templateUrl: 'views/directives/event-table.html'
     };
 }
 
-function TaskEditorDirective(TaskSvc, $filter) {
+function TaskEditorDirective($filter, $modal, $log) {
     return {
         restrict: 'E',
         scope: {
@@ -936,75 +1019,36 @@ function TaskEditorDirective(TaskSvc, $filter) {
                     scope.songs.push(i.toString());
                 }
 
-                if (scope.hasConductor && (!scope.task.assignments || scope.task.assignments.length === 0)) {
-                    scope.task.assignments = [{
-                        type: 'Conductor',
-                        assignee: {
-                            id: null
-                        }
-                    }];
-                }
+                scope.selectAssignee = function (assignment) {
 
-                if (scope.hasAssistent && scope.task.assignments.length < 2) {
-                    scope.task.assignments.push({
-                        type: 'Assistant',
-                        assignee: {
-                            id: null
+                    var modalInstance = $modal.open({
+                        templateUrl: 'views/domain/assignee-picker.html',
+                        controller: AssigneePickerController,
+                        size: 'md',
+                        resolve: {
+                            task: function () {
+                                return scope.task;
+                            },
+                            persons: function () {
+                                return scope.persons;
+                            },
+                            assignment: function () {
+                                return assignment;
+                            }
                         }
                     });
-                }
-                
-                if(scope.persons.length >0) {
-                    scope.personIds = [];
-                    angular.forEach(scope.persons, function (person) {
-                        scope.personIds.push(person.id);
+
+                    modalInstance.result.then(function (assignee) {
+                        assignment.assignee = assignee;
+
+                    }, function (reason) {
+                        $log.info('Modal dismissed at: ' + new Date());
                     });
-
-                    // We are gonna decorate the list of persons for each assignment list so we need copies for each
-                    scope.personLists = [];
-                    for (i = 0; i < scope.task.assignments.length; i++) {
-                        scope.personLists[i] = angular.copy(scope.persons);
-                        
-                        //... and add an empty lastAssignmentStartTime on each one of them
-                        for(e = 0;e<scope.personLists[i].length;e++) {
-                            scope.personLists[i][e].lastAssignmentStartTime = null;
-                        }
-                    }
-                    
-                    var updateLastAssignmentDates = function(tasks) {
-                        angular.forEach(tasks, function (task) {
-                                angular.forEach(task.assignments, function (assignment, index) {
-                                    angular.forEach(scope.personLists[index], function (person) {
-                                        if (assignment.assignee.id === person.id && assignment.type === assignment.type) {
-                                            person.lastAssignmentStartTime = task.startTime;
-                                        }
-                                    });
-                                });
-                            });
-                    };
-
-                    if (scope.historicAssignmentsType !== scope.task.type) {
-                        scope.historicAssignmentsType = scope.task.type;
-                        scope.historicAssignments = TaskSvc.query({
-                            persons: scope.personIds,
-                            taskType: scope.task.type,
-                            mode: 'singularity',
-                            order: 'desc'
-                        });
-                        scope.historicAssignments.$promise.then(updateLastAssignmentDates);
-
-                    } else {
-                        updateLastAssignmentDates(scope.historicAssignments);
-                    }
-                }
+                };
             };
 
             scope.generateTitle = function (person) {
-                var title = person.firstName + ' ' + person.lastName;
-                if (person.lastAssignmentStartTime) {
-                    title += ' (' + $filter('date')(person.lastAssignmentStartTime, 'shortDate') + ')';
-                }
-                return title;
+                return person.firstName + ' ' + person.lastName;
             };
 
             scope.$watch('task', scope.initTask);
@@ -1017,25 +1061,20 @@ function TaskEditorDirective(TaskSvc, $filter) {
     };
 }
 
-function LastAssignmentDateFilter() {
-    return function (input, assignments, assignmentType) {
-        var output;
-        if (assignments) {
-            output = [];
-            angular.forEach(input, function (person) {
-                person = angular.copy(person);
+function MetaSuggestionPersonFilter() {
+    return function (input, meta) {
+        
+        var suggestedSex = meta['SuggestedSex'], output = [];
+        
+        var isSexAccepted = function(person) {
+            return !suggestedSex || suggestedSex === person.sex;
+        };
+        
+        angular.forEach(input, function (person) {
+            if(isSexAccepted(person)) {
                 output.push(person);
-                angular.forEach(assignments, function (task) {
-                    angular.forEach(task.assignments, function (assignment) {
-                        if (assignment.assignee.id === person.id && assignment.type === assignmentType) {
-                            person.lastAssignmentStartTime = task.startTime;
-                        }
-                    });
-                });
-            });
-        } else {
-            output = input;
-        }
+            }
+        });
         return output;
     };
 }
@@ -1055,7 +1094,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('personForm', PersonFormDirective)
     .directive('taskEditor', TaskEditorDirective)
     .directive('eventTable', EventTableDirective)
-    .filter('lastAssignmentDate', LastAssignmentDateFilter)
+    .filter('metaSuggestions', MetaSuggestionPersonFilter)
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
         
 

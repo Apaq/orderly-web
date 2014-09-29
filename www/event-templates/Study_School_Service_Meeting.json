@@ -19,7 +19,10 @@
                     "duration": 2,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 },
@@ -28,11 +31,16 @@
                     "duration": 30,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         },
                         {
-                            "type": "Reader"
-                                    
+                            "type": "Reader",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 },
@@ -41,33 +49,45 @@
                     "duration": 10,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 },
                 {
-                    "type": "SchoolStudent",
+                    "type": "StudentAssignment",
                     "duration": 6,
                     "assignments": [
                         {
-                            "type": "Reader"
+                            "type": "Reader",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 },
                 {
-                    "type": "SchoolStudent",
+                    "type": "StudentAssignment",
                     "duration": 7,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Female"
+                            }
                         },
                         {
-                            "type": "Assistant"
+                            "type": "Assistant",
+                            "meta": {
+                                "SuggestedSex": "Female"
+                            }
                         }
                     ]
                 },
                 {
-                    "type": "SchoolStudent",
+                    "type": "StudentAssignment",
                     "duration": 7,
                     "assignments": [
                         {
@@ -87,7 +107,11 @@
                     "duration": 15,
                     "assignments": [
                         {
-                            "type": "Speaker"
+                            "type": "Speaker",
+                            "meta": {
+                                "SuggestedSex": "Male",
+                                "SuggestedRole": "Elder"
+                            }
                         }
                     ]
                 },
@@ -96,7 +120,11 @@
                     "duration": 15,
                     "assignments": [
                         {
-                            "type": "Speaker"
+                            "type": "Speaker",
+                            "meta": {
+                                "SuggestedSex": "Male",
+                                "SuggestedRole": "Servant"
+                            }
                         }
                     ]
                 },
@@ -109,7 +137,10 @@
                     "duration": 2,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedSex": "Male"
+                            }
                         }
                     ]
                 }
@@ -124,7 +155,10 @@
                     "duration": 103,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedRole": "SoundManager"
+                            }
                         }
                     ]
                 }
@@ -138,7 +172,10 @@
                     "duration": 103,
                     "assignments": [
                         {
-                            "type": "Conductor"
+                            "type": "Conductor",
+                            "meta": {
+                                "SuggestedRole": "PlatformManager"
+                            }
                         }
                     ]
                 }

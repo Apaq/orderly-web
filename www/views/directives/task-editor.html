@@ -3,11 +3,12 @@
         <div class="form-group" ng-repeat="assignment in task.assignments">
             <label for="select" class="col-lg-2 control-label">{{'ASSIGNMENT_TYPES.' + assignment.type | translate}}</label>
             <div class="col-lg-10">
-                <input type="text" ng-if="readonly" ng-readonly="true" ng-value="assignment.assignee.firstName + ' ' + assignment.assignee.lastName">
-                <select  ng-if="!readonly" class="form-control" ng-model="assignment.assignee.id" ng-options="person.id as generateTitle(person) for person in personLists[$index] | orderBy:['lastAssignmentStartTime', 'firstName', 'lastName']">
-                  <option value="">-- Ingen --</option>
-                </select>
-                
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-disabled="true" ng-value="assignment.assignee.firstName + ' ' + assignment.assignee.lastName">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" ng-click="selectAssignee(assignment)">Select</button>
+                    </span>
+                  </div>
             </div>
         </div>
 
@@ -15,9 +16,19 @@
             <label for="select" class="col-lg-2 control-label">Sangnr.</label>
             <div class="col-lg-10">
                 <input type="text" ng-if="readonly" ng-readonly="true" ng-value="task.meta['int_SongNo']">
-                <select  ng-if="!readonly" class="form-control" ng-model="task.meta['int_SongNo']" ng-options="song for song in songs"></select>
+                <select ng-if="!readonly" class="form-control" ng-model="task.meta['int_SongNo']" ng-options="song as song + ': ' + ('SONG_TITLES.' + song | translate) for song in songs">
+                    <option value="">Ikke valgt</option>
+                </select>
             </div>
         </div>
+        
+        <div class="form-group" ng-if="task.type === 'Witnessing'">
+            <label for="select" class="col-lg-2 control-label">Lokation</label>
+            <div class="col-lg-10">
+                <input type="text" ng-readonly="readonly" ng-model="task.meta['Location']">
+            </div>
+        </div>
+        
         <div class="form-group">
             <label for="select" class="col-lg-2 control-label">Varighed</label>
             <div class="col-lg-10">
