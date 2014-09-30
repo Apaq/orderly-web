@@ -26,7 +26,8 @@
     "angular-i18n": "~1.2.22",
     "jspdf": "~1.0.178",
     "angular-translate": "~2.4.0",
-    "angular-translate-loader-static-files": "~2.4.0"  
+    "angular-translate-loader-static-files": "~2.4.0",
+    "teljs": "*"
   },
   "resolutions": {
     "jquery": "~1.10.2",
