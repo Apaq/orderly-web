@@ -65,7 +65,8 @@
         "SECURITY": "Sikkerhed",
         "ADMIN": "Admin",
         "PROFILE": "Profil",
-        "LOG_OUT": "Log ud"
+        "LOG_OUT": "Log ud",
+        "LOCATION": "Lokation"
     },
     "EVENT_TYPES": {
         "FieldServiceMeeting": "Samling",
@@ -102,7 +103,8 @@
         "Elder": "Ældste",
         "Secretary": "Sekretær",
         "SchoolOverseer": "Skoletjener",
-        "ServiceOverseer": "Tjenestetilsynsmand"
+        "ServiceOverseer": "Tjenestetilsynsmand",
+        "Servant": "Tjener"
     },
     "SECURITY_QUESTION_TYPES": {
         "FirstPet": "Hvad var navnet på dit først kæledyr?",

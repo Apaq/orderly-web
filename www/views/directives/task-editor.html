@@ -15,8 +15,8 @@
         <div class="form-group" ng-if="isSong">
             <label for="select" class="col-lg-2 control-label">Sangnr.</label>
             <div class="col-lg-10">
-                <input type="text" ng-if="readonly" ng-readonly="true" ng-value="task.meta['int_SongNo']">
-                <select ng-if="!readonly" class="form-control" ng-model="task.meta['int_SongNo']" ng-options="song as song + ': ' + ('SONG_TITLES.' + song | translate) for song in songs">
+                <input type="text" ng-if="readonly" ng-readonly="true" ng-value="task.meta['']">
+                <select ng-if="!readonly" class="form-control" ng-model="task.meta['']" ng-options="song as song + ': ' + ('SONG_TITLES.' + song | translate) for song in songs">
                     <option value="">Ikke valgt</option>
                 </select>
             </div>

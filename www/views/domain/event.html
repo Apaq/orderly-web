@@ -1,4 +1,14 @@
-<div class="modal-header">
+<event-table event="event"></event-table>
+<div class="modal-footer" ng-if="!readonly">
+    <button class="btn btn-primary" ng-click="ok()" translate="EVENT.EDITOR.OK">OK</button>
+    <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.EDITOR.CANCEL">Annuller</button>
+
+    <button class="btn btn-danger" ng-click="delete()" translate="EVENT.EDITOR.DELETE">Slet</button>
+</div>
+<div class="modal-footer" ng-if="readonly">
+    <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.EDITOR.CLOSE">Luk</button>
+</div-->
+<!--div class="modal-header">
     <div class="row">
         <div class="col-sm-6">
             <h3 class="modal-title">{{'EVENT_TYPES.' + event.type | translate}}</h3>
@@ -50,5 +60,5 @@
 </div>
 <div class="modal-footer" ng-if="readonly">
     <button class="btn btn-warning" ng-click="cancel()" translate="EVENT.EDITOR.CLOSE">Luk</button>
-</div>
+</div-->
 

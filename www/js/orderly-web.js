@@ -191,31 +191,33 @@ function AssignmentController($scope, TaskSvc) {
     }
 }
 
-function AssigneePickerController($scope, persons, task, assignment, $modalInstance, TaskSvc) {
+function AssigneePickerController($scope, relations, task, assignment, $modalInstance, TaskSvc) {
     $scope.task = task;
     $scope.assignment = assignment;
-    $scope.persons = angular.copy(persons);
+    $scope.relations = angular.copy(relations);
     $scope.assignee = null;
+    $scope.loading = true;
     
     $scope.personIds = [];
-    angular.forEach($scope.persons, function (person) {
-        $scope.personIds.push(person.id);
-        person.lastAssignmentStartTime = null;
+    angular.forEach($scope.relations, function (relation) {
+        $scope.personIds.push(relation.person.id);
+        relation.lastAssignmentStartTime = null;
     });
     
     var updateLastAssignmentDates = function(tasks) {
         angular.forEach(tasks, function (task) {
-                angular.forEach(task.assignments, function (assignment) {
-                    angular.forEach($scope.persons, function (person) {
-                        if (assignment.assignee &&
-                                assignment.assignee.id === person.id && 
-                                $scope.assignment.type === assignment.type && 
-                                $scope.task.type === task.type) {
-                            person.lastAssignmentStartTime = task.startTime;
-                        }
-                    });
+            angular.forEach(task.assignments, function (assignment) {
+                angular.forEach($scope.relations, function (relation) {
+                    if (assignment.assignee &&
+                            assignment.assignee.id === relation.person.id && 
+                            $scope.assignment.type === assignment.type && 
+                            $scope.task.type === task.type) {
+                        relation.lastAssignmentStartTime = task.startTime;
+                    }
                 });
             });
+        });
+        $scope.loading = false;
     };
 
 
@@ -228,8 +230,8 @@ function AssigneePickerController($scope, persons, task, assignment, $modalInsta
     $scope.historicAssignments.$promise.then(updateLastAssignmentDates);
 
 
-    $scope.select = function(person) {
-        $scope.assignee = person;
+    $scope.select = function(assignee) {
+        $scope.assignee = assignee;
     };
 
     $scope.ok = function () {
@@ -414,13 +416,13 @@ function AdminPersonListController($scope, PersonSvc, $modal, $log) {
     $scope._load();
 }
 
-function RelationController($scope, $log, relation, domain, RelationSvc, PersonSvc, $modalInstance) {
+function RelationController($scope, $log, relation, domain, RelationSvc, PersonSvc, $modalInstance, RoleSvc) {
     $scope.relation = relation;
     $scope.person = relation.person;
     $scope.domain = domain;
-
+    $scope.relationRoles = RoleSvc.get();
     $scope.isValidForDomain = function (role) {
-        return $scope.relationRoleDomainTypes[role].indexOf($scope.domain.type) >= 0;
+        return $scope.relationRoles[role].indexOf($scope.domain.type) >= 0;
     };
 
 
@@ -889,16 +891,21 @@ function PersonFormDirective() {
     };
 }
 
-function EventTableDirective(PersonSvc, EventSvc, $modal) {
+function EventTableDirective(RelationSvc, EventSvc, $modal, $log) {
     return {
         restrict: 'E',
         scope: {
             event: '='
         },
         link: function (scope, element, attrs) {
-            scope.persons = PersonSvc.query({
+            scope.relations = RelationSvc.query({
                 domain: scope.event.domain.id
             });
+            
+            scope.songs = [];
+            for (i = 1; i <= 135; i++) {
+                scope.songs.push(i.toString());
+            }
             
             scope.getMaxNumberOfTasks = function() {
                 var count = 0, range, i;
@@ -969,18 +976,30 @@ function EventTableDirective(PersonSvc, EventSvc, $modal) {
                 return result;
             };
             
+            scope.editTask = function(task) {
+                alert("Edit");
+            };
+            
+            scope.generateTitle = function(task) {
+                var title = task.duration + ' min.';
+                if(task.meta.Curriculum) {
+                    title += ": " + task.meta.Curriculum;
+                }
+                return title;
+            };
+            
             scope.selectAssignee = function (task, assignment) {
 
                     var modalInstance = $modal.open({
                         templateUrl: 'views/domain/assignee-picker.html',
                         controller: AssigneePickerController,
-                        size: 'md',
+                        size: 'sm',
                         resolve: {
                             task: function () {
                                 return task;
                             },
-                            persons: function () {
-                                return scope.persons;
+                            relations: function () {
+                                return scope.relations;
                             },
                             assignment: function () {
                                 return assignment;
@@ -1007,7 +1026,7 @@ function TaskEditorDirective($filter, $modal, $log) {
         restrict: 'E',
         scope: {
             task: '=',
-            persons: '=',
+            relations: '=',
             readonly: '='
         },
         link: function (scope, element, attrs) {
@@ -1039,8 +1058,8 @@ function TaskEditorDirective($filter, $modal, $log) {
                             task: function () {
                                 return scope.task;
                             },
-                            persons: function () {
-                                return scope.persons;
+                            relations: function () {
+                                return scope.relations;
                             },
                             assignment: function () {
                                 return assignment;
@@ -1072,17 +1091,45 @@ function TaskEditorDirective($filter, $modal, $log) {
 }
 
 function MetaSuggestionPersonFilter() {
-    return function (input, meta) {
+    return function (input, task, assignment) {
         
-        var suggestedSex = meta['SuggestedSex'], output = [];
+        var suggestedSex = assignment.meta['SuggestedSex'], 
+                suggestedRole = assignment.meta['SuggestedRole'], 
+                output = [];
         
-        var isSexAccepted = function(person) {
-            return !suggestedSex || suggestedSex === person.sex;
+        var isSexAccepted = function(relation) {
+            return !suggestedSex || suggestedSex === relation.person.sex;
         };
         
-        angular.forEach(input, function (person) {
-            if(isSexAccepted(person)) {
-                output.push(person);
+        var isRoleAccepted = function(relation) {
+            return !suggestedRole || relation.roles.indexOf(suggestedRole) >= 0;
+        };
+        
+        var isUsedFor = function(relation, task, assignment) {
+            var usage = relation.person.meta['UsedFor'], usageElement, i, usageArray, 
+                    usedForTask, usedForAssignment, result = false;
+            usageArray = (usage ? usage.split(',') : []);
+            
+            for(i=0;i<usageArray.length;i++) {
+                usageElement = usageArray[i].split('.');
+                if(usageElement.length === 2) {
+                    usedForTask = usageElement[0];
+                    usedForAssignment = usageElement[1];
+                    if((usedForTask === '*' || usedForTask === task.type) &&
+                            (usedForAssignment === '*' || usedForAssignment === assignment.type)) {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+            return result;
+        };
+        
+        angular.forEach(input, function (relation) {
+            if(isSexAccepted(relation) && 
+                    isRoleAccepted(relation) && 
+                    isUsedFor(relation, task, assignment)) {
+                output.push(relation);
             }
         });
         return output;
@@ -1108,13 +1155,13 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
         
 
-        $rootScope.relationRoleDomainTypes = {
+        /*$rootScope.relationRoleDomainTypes = {
             Coordinator: ['Congregation', 'Circuit', 'Region', 'ServiceGroup', 'ServiceUnit'],
             Elder: ['Congregation'],
             Secretary: ['Congregation'],
             SchoolOverseer: ['Congregation'],
             ServiceOverseer: ['Congregation']
-        };
+        };*/
 
 
         $rootScope.context = {};

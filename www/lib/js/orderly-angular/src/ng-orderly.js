@@ -133,6 +133,10 @@ function RelationSvc($resource, orderly) {
     return $resource(orderly.getServiceUrl() + 'domains/:domain/relations/:id');
 }
 
+function RoleSvc($resource, orderly) {
+    return $resource(orderly.getServiceUrl() + 'system/relationRoles');
+}
+
 function LoginSvc($q, localStorageService, $http, $rootScope, orderly, $log) {
     'use strict';
     var currentUser = null;
@@ -215,5 +219,6 @@ angular.module('orderly.services', ['ngResource', 'LocalStorageModule'])
         'LoginSvc': LoginSvc,
         'RelationSvc': RelationSvc,
         'DomainSvc': DomainSvc,
-        'SystemSvc': SystemSvc
+        'SystemSvc': SystemSvc,
+        'RoleSvc': RoleSvc
     });

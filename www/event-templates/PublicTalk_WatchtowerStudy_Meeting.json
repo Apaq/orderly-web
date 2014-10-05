@@ -79,10 +79,7 @@
                     "duration": 103,
                     "assignments": [
                         {
-                            "type": "Conductor",
-                            "meta": {
-                                "SuggestedRole": "PlatformManager"
-                            }
+                            "type": "Assistant"
                         }
                     ]
                 }
@@ -96,10 +93,7 @@
                     "duration": 103,
                     "assignments": [
                         {
-                            "type": "Conductor",
-                            "meta": {
-                                "SuggestedRole": "PlatformManager"
-                            }
+                            "type": "Assistant"
                         }
                     ]
                 }
