@@ -82,6 +82,7 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
+                    <li ng-if="isLoading()"><a><i class="glyphicon glyphicon-refresh spinning"></i></a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='domain'">{{context.relation.domain.name}}<span class="caret"></span></a>
                         <a class="dropdown-toggle" data-toggle="dropdown" ng-if="context.mode==='admin'">{{'MENU.ADMIN' | translate}}<span class="caret"></span></a>

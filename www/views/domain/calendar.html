@@ -29,7 +29,8 @@
 
             </div>
             <div class="panel-body no-padding">
-                <div ng-hide="view !== 'calendar'" ui-calendar="uiConfig.calendar" class="calendar" ng-model="eventSources" calendar="calendarObj" ng-keydown="onKeyPress($event)"></div>
+                <!--div ng-hide="view !== 'calendar'" ui-calendar="uiConfig.calendar" class="calendar" ng-model="eventSources" calendar="calendarObj" ng-keydown="onKeyPress($event)"></div-->
+                <event-calendar domain="context.relation.domain" editable="canEdit()" date="date"></event-calendar>
             </div>
         </div>
 

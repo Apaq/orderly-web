@@ -63,7 +63,7 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
 
 }
 
-function MenuController($scope, $location, LoginSvc, $route) {
+function MenuController($scope, $location, LoginSvc, $route, LoadingIndicatorSvc) {
     $scope.selectDomain = function (relation) {
         $scope.context.relation = relation;
         $scope.context.mode = 'domain';
@@ -99,6 +99,10 @@ function MenuController($scope, $location, LoginSvc, $route) {
 
     $scope.logout = function () {
         LoginSvc.deauthenticate();
+    };
+    
+    $scope.isLoading = function() {
+        return LoadingIndicatorSvc.isLoading();
     };
 }
 
@@ -521,18 +525,48 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     $scope.init();
 }
 
-function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale, $http, $filter) {
+function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndicatorSvc, $http, $filter) {
 
-    $scope.currentRange = null;
-    $scope.currentEvents = null;
+    $scope.date = new Date();
+    
+    $scope.$on('events-loading', function() {
+        LoadingIndicatorSvc.setLoading(true);
+    });
+    
+    $scope.$on('events-loaded', function(e, range) {
+        LoadingIndicatorSvc.setLoading(false);
+    });
+    
+    $scope.$on('day-clicked', function(e, date) {
+        $scope.addEvent(date);
+    });
+    
+    $scope.$on('event-clicked', function(e, event) {
+        $scope.open('lg', event, !$scope.canEdit());
+    });
+    
+    $scope.$on('range-changed', function(e, range) {
+        $scope.currentRange = range;
+    });
+    
+    $scope.$on('event-dropped', function(e, event, cancelFunc) {
+       EventSvc.save({
+            id: event.id
+        }, event).$promise.then(null, function (reason) {
+            $log.info("Unable to save event after drop. Reason: " + reason);
+            cancelFunc();
+        }); 
+    });
 
-    $scope._canEdit = function () {
+    $scope.canEdit = function () {
         var result = false;
-        angular.forEach($scope.context.relation.roles, function (role) {
-            if (role === 'Coordinator') {
-                result = true;
-            }
-        });
+        if($scope.context.relation) {
+            angular.forEach($scope.context.relation.roles, function (role) {
+                if (role === 'Coordinator') {
+                    result = true;
+                }
+            });
+        }
         return result;
     };
 
@@ -621,108 +655,16 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
 
     };
 
-    /* event source that calls a function on every view switch */
-    $scope.eventsF = function (start, end, callback) {
-        if ($scope.context.relation) {
-            EventSvc.query({
-                domain: $scope.context.relation.domain.id,
-                from: start,
-                to: end,
-                mode: 'full'
-            }).$promise.then(function (events) {
-                $scope.currentEvents = events;
-                $scope.currentRange = {
-                    start: start,
-                    end: end
-                };
-                var tEvents = [];
-                angular.forEach(events, function (event) {
-                    tEvents.push({
-                        title: $filter('translate')('EVENT_TYPES.' + event.type),
-                        start: new Date(event.startTime.getTime()),
-                        end: new Date(event.endTime.getTime()),
-                        allDay: false,
-                        className: ['field-service-meeting'],
-                        durationEditable: false,
-                        orgEvent: event
-                    });
-                });
-                callback(tEvents);
-            });
-        } else {
-            $scope.currentEvents = null;
-            callback([]);
-        }
-    };
-
-    $scope.onEventClick = function (event, jsEvent, view) {
-        EventSvc.get({
-            id: event.orgEvent.id,
-            mode: 'full'
-        }).$promise.then(function (fullEvent) {
-            $scope.open('lg', fullEvent, !$scope._canEdit());
-        });
-
-    };
-
-    /* alert on Drop */
-    $scope.onDrop = function (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
-        var orgEvent = event.orgEvent;
-        orgEvent.startTime.setDate(orgEvent.startTime.getDate() + dayDelta);
-        orgEvent.startTime.setMinutes(orgEvent.startTime.getMinutes() + minuteDelta);
-        EventSvc.save({
-            id: orgEvent.id
-        }, orgEvent).$promise.then(null, function (reason) {
-            $log.info("Unable to save event after drop. Reason: " + reason);
-            revertFunc();
-        });
-    };
-
-    $scope.updateDate = function (view, element) {
-        $scope.date = $scope.calendarObj.fullCalendar('getDate');
-    };
-
-    /* Change View */
-    $scope.changeView = function (view) {
-        $scope.calendarObj.fullCalendar('changeView', view);
-    };
-
-    $scope.getView = function () {
-        if ($scope.calendarObj) {
-            var view = $scope.calendarObj.fullCalendar('getView');
-            return view.name;
-        } else {
-            return null;
-        }
-    };
-
-
     $scope.next = function () {
-        $scope.calendarObj.fullCalendar('next');
+        $scope.date.setMonth($scope.date.getMonth() + 1);
     };
 
     $scope.prev = function () {
-        $scope.calendarObj.fullCalendar('prev');
+        $scope.date.setMonth($scope.date.getMonth() - 1);
     };
-
-    $scope._renderEvent = function (event, element, view) {
-        event = event.orgEvent;
-        var singleAgenda = event.agendas.length === 1;
-        var singleTask = singleAgenda && event.agendas[0].tasks.length === 1;
-        var singleAssignment = singleTask && event.agendas[0].tasks[0].assignments.length === 1;
-
-        var singleAssignmentAssignee = singleAssignment && event.agendas[0].tasks[0].assignments[0].assignee;
-
-        if (singleAssignmentAssignee) {
-            var name = singleAssignmentAssignee.firstName + ' ' + singleAssignmentAssignee.lastName;
-            element.find('.fc-event-inner').append('<span class="fc-event-title"> - ' + name + '</span>');
-        }
-        return element;
-    };
-
 
     $scope.addEvent = function (date, jsEvent, view) {
-        if ($scope._canEdit()) {
+        if ($scope.canEdit()) {
             var modalInstance = $modal.open({
                 templateUrl: 'views/domain/event-template-picker.html',
                 controller: function ($scope, $modalInstance) {
@@ -753,8 +695,6 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
                     });
                 });
 
-
-
             });
 
         } else {
@@ -762,33 +702,7 @@ function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, 
         }
     };
 
-    /* config object */
-    $scope.uiConfig = {
-        calendar: {
-            dayNames: $locale.DATETIME_FORMATS.DAY,
-            dayNamesShort: $locale.DATETIME_FORMATS.SHORTDAY,
-            monthNames: $locale.DATETIME_FORMATS.MONTH,
-            monthNamesShort: $locale.DATETIME_FORMATS.SHORTMONTH,
-            timeFormat: 'H(:mm)',
-            axisFormat: 'H(:mm)',
-            firstDay: 1,
-            height: 650,
-            editable: true,
-            eventClick: $scope.onEventClick,
-            eventDrop: $scope.onDrop,
-            viewRender: $scope.updateDate,
-            dayClick: $scope.addEvent,
-            eventRender: $scope._renderEvent,
-            allDaySlot: false,
-            minTime: '7:30',
-            maxTime: '22.30'
-        }
-    };
-
-
-    /* event sources array*/
-    $scope.eventSources = [$scope.eventsF];
-    $scope.eventSources2 = [$scope.calEventsExt, $scope.eventsF, $scope.events];
+    
 }
 
 function RelationListDirective($log, $modal, RelationSvc, PersonSvc, $q, $rootScope) {
@@ -887,6 +801,128 @@ function PersonFormDirective() {
             person: '='
         },
         templateUrl: 'views/directives/person-form.html'
+    };
+}
+
+function EventCalendarDirective(EventSvc, $locale, $filter) {
+    return {
+        restrict: 'E',
+        scope: {
+            date: '=',
+            editable: '=',
+            domain: '='
+        },
+        controller: function ($scope) {
+            $scope.currentRange = null;
+            $scope.currentEvents = null;
+            
+            $scope.$watch('date', function(date) {
+                if(date && $scope.calendarObj) {
+                    $scope.calendarObj.fullCalendar( 'gotoDate', date );
+                }
+            }, true);
+            
+            $scope.eventsF = function (start, end, callback) {
+                $scope.$emit('events-loading');
+                if ($scope.domain) {
+                    EventSvc.query({
+                        domain: $scope.domain.id,
+                        from: start,
+                        to: end,
+                        mode: 'full'
+                    }).$promise.then(function (events) {
+                        $scope.currentEvents = events;
+                        $scope.currentRange = {
+                            start: start,
+                            end: end
+                        };
+                        var tEvents = [];
+                        angular.forEach(events, function (event) {
+                            tEvents.push({
+                                title: $filter('translate')('EVENT_TYPES.' + event.type),
+                                start: new Date(event.startTime.getTime()),
+                                end: new Date(event.endTime.getTime()),
+                                allDay: false,
+                                className: ['field-service-meeting'],
+                                durationEditable: false,
+                                orgEvent: event
+                            });
+                        });
+                        callback(tEvents);
+                        
+                        $scope.$emit('range-changed', $scope.currentRange);
+                        $scope.$emit('events-loaded', $scope.currentEvents);
+                
+                    });
+                } else {
+                    $scope.currentEvents = null;
+                    callback([]);
+                    $scope.$emit('events-loaded', $scope.currentEvents);
+                }
+                
+
+            };
+
+            $scope.onEventClick = function (event, jsEvent, view) {
+                $scope.$emit('event-clicked', event.orgEvent);
+            };
+
+            $scope.onDrop = function (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) {
+                var orgEvent = angular.copy(event.orgEvent), cancelFunc;
+                orgEvent.startTime.setDate(orgEvent.startTime.getDate() + dayDelta);
+                orgEvent.startTime.setMinutes(orgEvent.startTime.getMinutes() + minuteDelta);
+                
+                cancelFunc = function() {
+                    revertFunc();
+                };
+                
+                $scope.$emit('event-dropped', orgEvent, cancelFunc);
+            };
+
+            $scope._renderEvent = function (event, element, view) {
+                event = event.orgEvent;
+                var singleAgenda = event.agendas.length === 1;
+                var singleTask = singleAgenda && event.agendas[0].tasks.length === 1;
+                var singleAssignment = singleTask && event.agendas[0].tasks[0].assignments.length === 1;
+
+                var singleAssignmentAssignee = singleAssignment && event.agendas[0].tasks[0].assignments[0].assignee;
+
+                if (singleAssignmentAssignee) {
+                    var name = singleAssignmentAssignee.firstName + ' ' + singleAssignmentAssignee.lastName;
+                    element.find('.fc-event-inner').append('<span class="fc-event-title"> - ' + name + '</span>');
+                }
+                return element;
+            };
+
+
+            $scope.onDayClicked = function (date, jsEvent, view) {
+                $scope.$emit('day-clicked', date);
+            };
+
+            $scope.uiConfig = {
+                calendar: {
+                    dayNames: $locale.DATETIME_FORMATS.DAY,
+                    dayNamesShort: $locale.DATETIME_FORMATS.SHORTDAY,
+                    monthNames: $locale.DATETIME_FORMATS.MONTH,
+                    monthNamesShort: $locale.DATETIME_FORMATS.SHORTMONTH,
+                    timeFormat: 'H(:mm)',
+                    axisFormat: 'H(:mm)',
+                    firstDay: 1,
+                    height: 650,
+                    editable: true,
+                    eventClick: $scope.onEventClick,
+                    eventDrop: $scope.onDrop,
+                    dayClick: $scope.onDayClicked,
+                    eventRender: $scope._renderEvent,
+                    allDaySlot: false,
+                    minTime: '7:30',
+                    maxTime: '22.30'
+                }
+            };
+
+            $scope.eventSources = [$scope.eventsF];
+        },
+        templateUrl: 'views/directives/event-calendar.html'
     };
 }
 
@@ -1135,6 +1171,19 @@ function MetaSuggestionPersonFilter() {
     };
 }
 
+function LoadingIndicatorSvc() {
+    'use strict';
+    var loading = false;
+    return {
+        setLoading: function (value) {
+            loading = value === true;
+        },
+        isLoading: function() {
+            return loading;
+        }
+    };
+}
+
 angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.calendar', 'ui.bootstrap', 'pascalprecht.translate'])
     .config(AppConfig)
     .controller('LoginController', LoginController)
@@ -1150,19 +1199,13 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('personForm', PersonFormDirective)
     .directive('taskEditor', TaskEditorDirective)
     .directive('eventTable', EventTableDirective)
+    .directive('eventCalendar', EventCalendarDirective)
     .filter('metaSuggestions', MetaSuggestionPersonFilter)
+    .factory({
+        'LoadingIndicatorSvc': LoadingIndicatorSvc
+    })
     .run(function ($rootScope, $location, PersonSvc, $route, LoginSvc) {
         
-
-        /*$rootScope.relationRoleDomainTypes = {
-            Coordinator: ['Congregation', 'Circuit', 'Region', 'ServiceGroup', 'ServiceUnit'],
-            Elder: ['Congregation'],
-            Secretary: ['Congregation'],
-            SchoolOverseer: ['Congregation'],
-            ServiceOverseer: ['Congregation']
-        };*/
-
-
         $rootScope.context = {};
 
         $rootScope.$on("login", function (event, user) {
