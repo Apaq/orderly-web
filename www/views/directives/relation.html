@@ -18,9 +18,15 @@
                         <div class="col-sm-10">
                             <div class="checkbox" ng-repeat="(role, data) in relationRoles">
                                 <label ng-if="isValidForDomain(role)">
-                                    <input type="checkbox" name="relation.roles[]" value="{{role}}" ng-checked="relation.roles.indexOf(role) > -1" ng-click="toggleRole(role)">{{'RELATION_ROLES.'+role | translate}}
+                                    <input type="checkbox" name="relation.roles[]" value="{{role}}" ng-checked="relation.roles.indexOf(role) > -1" ng-click="toggleRole(role)">{{'RELATION_ROLES.' + role| translate}}
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputUsedFor" class="col-lg-2 control-label">Bruges til</label>
+                        <div class="col-lg-10">
+                            <textarea type="text" class="form-control" id="inputUsedFor" ng-model="person.meta['UsedFor']" placeholder="F.eks. Prayer.*,BibleStudy.Conductor"></textarea>
                         </div>
                     </div>
                 </fieldset>
