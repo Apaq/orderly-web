@@ -8,10 +8,6 @@
                             <button class="btn btn-default btn-sm" ng-click="prev()">&lt;</button>
                             <button class="btn btn-default btn-sm" ng-click="next()">&gt;</button>
                         </div>
-                        <div class="btn-group">
-                            <button class="btn btn-default btn-sm" ng-class="{active:view === 'calendar'}" ng-click="view = 'calendar'"><i class="glyphicon glyphicon-calendar"></i></button>
-                            <button class="btn btn-default btn-sm" ng-class="{active:view === 'schedule'}" ng-click="view = 'schedule'"><i class="glyphicon glyphicon-list-alt"></i></button>
-                        </div>
                     </div>
                     <div class="col-sm-4">
                         <h1 style="text-align:center">{{date | date:'MMMM yyyy' | uppercase}}</h1>
@@ -34,18 +30,6 @@
             </div>
             <div class="panel-body no-padding">
                 <div ng-hide="view !== 'calendar'" ui-calendar="uiConfig.calendar" class="calendar" ng-model="eventSources" calendar="calendarObj" ng-keydown="onKeyPress($event)"></div>
-                <div ng-if="view==='schedule'">
-                    <div class="col-sm-8 col-sm-offset-2" ng-repeat="event in currentEvents| orderBy:'startTime'">
-
-                        <div class="alert alert-info no-margin-bottom">
-                            <strong>{{event.startTime| date:'mediumDate'}}</strong>
-                        </div>
-
-                        <event-table event="event"></event-table>
-
-                    </div>
-
-                </div>
             </div>
         </div>
 

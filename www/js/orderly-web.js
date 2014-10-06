@@ -523,7 +523,6 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
 
 function CalendarController($scope, EventSvc, $log, $location, $filter, $modal, $locale, $http, $filter) {
 
-    $scope.view = 'calendar';
     $scope.currentRange = null;
     $scope.currentEvents = null;
 
