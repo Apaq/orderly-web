@@ -971,10 +971,38 @@ function EventTableDirective(RelationSvc, EventSvc, $modal, $log) {
                 domain: scope.event.domain.id
             });
             
+            scope.time = angular.copy(scope.event.startTime);
+            
+            scope.$watch(function () {
+                var time = scope.time ? scope.time.getTime() : -1;
+                return time;
+            }, function () {
+                if (scope.time) {
+                    scope.event.startTime.setHours(scope.time.getHours());
+                    scope.event.startTime.setMinutes(scope.time.getMinutes());
+                    scope.updateTaskStartTimes();
+                }
+            });
+            
+            scope.$watch('event.startTime', scope.updateTaskStartTimes);
+            
             scope.songs = [];
             for (i = 1; i <= 135; i++) {
                 scope.songs.push(i.toString());
             }
+            
+            scope.updateTaskStartTimes = function() {
+                var i, e, agenda, task, currentTime;
+                for(i = 0;i<scope.event.agendas.length;i++) {
+                    agenda = scope.event.agendas[i];
+                    currentTime = angular.copy(scope.event.startTime);
+                    for(e = 0;e<agenda.tasks.length;e++) {
+                        task = agenda.tasks[e];
+                        task.startTime = angular.copy(currentTime);
+                        currentTime.setMinutes(currentTime.getMinutes() + task.duration);
+                    }
+                }
+            };
             
             scope.getMaxNumberOfTasks = function() {
                 var count = 0, range, i;

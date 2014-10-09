@@ -1,9 +1,15 @@
 <div class="panel panel-default no-margin">
     <div class="panel-heading">
-        <strong>{{event.startTime| date:'shortTime'}}: </strong>{{'EVENT_TYPES.' + event.type | translate}} <span ng-if="!isEventComplete(event)" class="glyphicon glyphicon-warning-sign" style="color:red" title="Denne begivenhed er ikke færdiggjort"></span>
-    </div>
+        <form class="form-inline" role="form">
+            <div class="form-group">
+                <input type="time" class="form-control input-sm" ng-model="time">
+                <label>{{'EVENT_TYPES.' + event.type| translate}} <span ng-if="!isEventComplete(event)" class="glyphicon glyphicon-warning-sign" style="color:red" title="Denne begivenhed er ikke færdiggjort"></span></label>
+            </div>
+        </form>
+
+     </div>
     <table class="table table-bordered">
-        <thead ng-if="event.agendas.length>1">
+        <thead ng-if="event.agendas.length > 1">
             <tr>
                 <th ng-repeat="agenda in event.agendas">
                     {{agenda.title ? agenda.title : 'Agenda ' +(1+$index)}}
@@ -13,31 +19,31 @@
         </thead>
         <tbody>
             <tr ng-repeat="n in getTaskRange()">
-                <td ng-repeat="agenda in event.agendas" rowspan="{{getRowSpan(agenda)}}" ng-if="n<agenda.tasks.length">
+                <td ng-repeat="agenda in event.agendas" rowspan="{{getRowSpan(agenda)}}" ng-if="n < agenda.tasks.length">
                     <span>
-                        {{agenda.tasks[n].startTime | date:'shortTime'}}: <a ng-click="editTask(agenda.tasks[n])" title="{{generateTitle(agenda.tasks[n])}}">{{'TASK_TYPES.' + agenda.tasks[n].type | translate}}</a>
+                        {{agenda.tasks[n].startTime| date:'shortTime'}}: <a ng-click="editTask(agenda.tasks[n])" title="{{generateTitle(agenda.tasks[n])}}">{{'TASK_TYPES.' + agenda.tasks[n].type| translate}}</a>
                     </span>
-                    
-                    <span ng-if="agenda.tasks[n].type==='Witnessing'" ng-click="enterLocation(agenda.tasks[n])" class="label" ng-class="{'label-info':agenda.tasks[n].meta.Location.length>0,'label-default':!(agenda.tasks[n].meta.Location.length>0)}" style="margin-left:4px">
-                        <span ng-if="agenda.tasks[n].meta.Location.length>0">{{agenda.tasks[n].meta.Location}}</span>
-                        <span ng-if="!(agenda.tasks[n].meta.Location.length>0)">{{'GENERAL.LOCATION' | translate}}</span>
-                    </span>
-                    
-                    <span ng-repeat="assignment in agenda.tasks[n].assignments" ng-click="selectAssignee(agenda.tasks[n], assignment)" class="label" ng-class="{'label-success':assignment.assignee,'label-danger':!assignment.assignee}" style="margin-left:4px" title="{{'ASSIGNMENT_TYPES.' + assignment.type | translate}}">
-                        {{assignment.assignee ? assignment.assignee.firstName + ' ' + assignment.assignee.lastName: 'ASSIGNMENT_TYPES.' + assignment.type | translate}}
-                    </span>
-                    <span ng-if="agenda.tasks[n].type==='Song'" ng-click="selectSong(agenda.tasks[n])" class="label" ng-class="{'label-success':agenda.tasks[n].meta.SongNo>0,'label-danger':!agenda.tasks[n].meta.SongNo>0}" style="margin-left:4px">
-                        <span ng-if="agenda.tasks[n].meta.SongNo>0">{{agenda.tasks[n].meta.SongNo + ': ' + ('SONG_TITLES.' + agenda.tasks[n].meta.SongNo | translate)}}</span>
-                        <span ng-if="!agenda.tasks[n].meta.SongNo>0">{{'TASK_TYPES.Song' | translate}}</span>
-                    </span>
-                    
-                    <span ng-if="agenda.tasks[n].type==='PublicTalk'" ng-click="enterPublicSpeaker(agenda.tasks[n])" class="label" ng-class="{'label-success':agenda.tasks[n].meta.Speaker.length>0,'label-danger':!(agenda.tasks[n].meta.Speaker.length>0)}" style="margin-left:4px">
-                        <span ng-if="agenda.tasks[n].meta.Speaker.length>0">{{agenda.tasks[n].meta.Speaker}}</span>
-                        <span ng-if="!(agenda.tasks[n].meta.Speaker.length>0)">{{'ASSIGNMENT_TYPES.Speaker' | translate}}</span>
-                    </span>
-                    
 
-                    
+                    <span ng-if="agenda.tasks[n].type === 'Witnessing'" ng-click="enterLocation(agenda.tasks[n])" class="label" ng-class="{'label-info':agenda.tasks[n].meta.Location.length > 0,'label-default':!(agenda.tasks[n].meta.Location.length > 0)}" style="margin-left:4px">
+                        <span ng-if="agenda.tasks[n].meta.Location.length > 0">{{agenda.tasks[n].meta.Location}}</span>
+                        <span ng-if="!(agenda.tasks[n].meta.Location.length > 0)">{{'GENERAL.LOCATION'| translate}}</span>
+                    </span>
+
+                    <span ng-repeat="assignment in agenda.tasks[n].assignments" ng-click="selectAssignee(agenda.tasks[n], assignment)" class="label" ng-class="{'label-success':assignment.assignee,'label-danger':!assignment.assignee}" style="margin-left:4px" title="{{'ASSIGNMENT_TYPES.' + assignment.type| translate}}">
+                        {{assignment.assignee ? assignment.assignee.firstName + ' ' + assignment.assignee.lastName : 'ASSIGNMENT_TYPES.' + assignment.type| translate}}
+                    </span>
+                    <span ng-if="agenda.tasks[n].type === 'Song'" ng-click="selectSong(agenda.tasks[n])" class="label" ng-class="{'label-success':agenda.tasks[n].meta.SongNo > 0,'label-danger':!agenda.tasks[n].meta.SongNo > 0}" style="margin-left:4px">
+                        <span ng-if="agenda.tasks[n].meta.SongNo > 0">{{agenda.tasks[n].meta.SongNo + ': ' + ('SONG_TITLES.' + agenda.tasks[n].meta.SongNo | translate)}}</span>
+                        <span ng-if="!agenda.tasks[n].meta.SongNo > 0">{{'TASK_TYPES.Song'| translate}}</span>
+                    </span>
+
+                    <span ng-if="agenda.tasks[n].type === 'PublicTalk'" ng-click="enterPublicSpeaker(agenda.tasks[n])" class="label" ng-class="{'label-success':agenda.tasks[n].meta.Speaker.length > 0,'label-danger':!(agenda.tasks[n].meta.Speaker.length > 0)}" style="margin-left:4px">
+                        <span ng-if="agenda.tasks[n].meta.Speaker.length > 0">{{agenda.tasks[n].meta.Speaker}}</span>
+                        <span ng-if="!(agenda.tasks[n].meta.Speaker.length > 0)">{{'ASSIGNMENT_TYPES.Speaker'| translate}}</span>
+                    </span>
+
+
+
                     <span class="pull-right glyphicon glyphicon-remove text-muted"></span>
 
                 </td>
