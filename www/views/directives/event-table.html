@@ -13,7 +13,7 @@
             <tr>
                 <th ng-repeat="agenda in event.agendas">
                     {{agenda.title ? agenda.title : 'Agenda ' +(1+$index)}}
-                    <span class="pull-right glyphicon glyphicon-remove text-muted"></span>
+                    <span class="pull-right glyphicon glyphicon-remove text-muted" ng-click="removeAgenda($index)"></span>
                 </th>
             </tr>
         </thead>

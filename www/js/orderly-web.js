@@ -594,7 +594,7 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
             size: size,
             resolve: {
                 event: function () {
-                    return event;
+                    return angular.copy(event);
                 },
                 readonly: function () {
                     return readonly === true;
@@ -1072,6 +1072,10 @@ function EventTableDirective(RelationSvc, EventSvc, $modal, $log) {
                 }
                 return result;
             };
+            
+            scope.removeAgenda = function(index) {
+                scope.event.agendas.splice(index, 1);
+            }
             
             scope.editTask = function(task) {
                 alert("Edit");
