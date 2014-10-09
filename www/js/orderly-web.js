@@ -606,7 +606,7 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
             EventSvc.save({
                 id: event.id
             }, event).$promise.then(function () {
-                $scope.calendarObj.fullCalendar('refetchEvents');
+                $scope.$broadcast('event-updated', event);
             });
 
         }, function (reason) {
@@ -844,6 +844,11 @@ function EventCalendarDirective(EventSvc, $locale, $filter) {
             
             $scope.$on('event-removed', function(e, event) {
                 $scope.calendarObj.fullCalendar('removeEvents', event.id);
+            });
+            
+            $scope.$on('event-updated', function(e, event) {
+                $scope.calendarObj.fullCalendar('removeEvents', event.id);
+                $scope.calendarObj.fullCalendar('renderEvent', $scope.toFullCalendarEvent(event));
             });
             
             $scope.toFullCalendarEvent = function(event) {
