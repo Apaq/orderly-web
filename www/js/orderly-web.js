@@ -1075,6 +1075,10 @@ function EventTableDirective(RelationSvc, EventSvc, $modal, $log) {
             
             scope.removeAgenda = function(index) {
                 scope.event.agendas.splice(index, 1);
+            };
+            
+            scope.removeTask = function(agendaIndex, taskIndex) {
+                scope.event.agendas[agendaIndex].tasks.splice(taskIndex, 1);
             }
             
             scope.editTask = function(task) {
