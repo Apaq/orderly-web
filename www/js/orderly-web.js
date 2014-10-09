@@ -195,12 +195,13 @@ function AssignmentController($scope, TaskSvc) {
     }
 }
 
-function AssigneePickerController($scope, relations, task, assignment, $modalInstance, TaskSvc) {
+function AssigneePickerController($scope, relations, task, assignment, $modalInstance, TaskSvc, $filter) {
     $scope.task = task;
     $scope.assignment = assignment;
     $scope.relations = angular.copy(relations);
     $scope.assignee = null;
     $scope.loading = true;
+    $scope.requirements = null;
     
     $scope.personIds = [];
     angular.forEach($scope.relations, function (relation) {
@@ -223,6 +224,20 @@ function AssigneePickerController($scope, relations, task, assignment, $modalIns
         });
         $scope.loading = false;
     };
+    
+    $scope.updateRequirements = function() {
+        var result = [];
+        if($scope.assignment.meta['SuggestedSex']) {
+            result.push($filter('translate')('GENERAL.' + $scope.assignment.meta['SuggestedSex'].toUpperCase()));
+        }
+        if($scope.assignment.meta['SuggestedRole']) {
+            result.push($filter('translate')('RELATION_ROLES.' + $scope.assignment.meta['SuggestedRole']));
+        }
+        
+        if(result.length > 0) {
+            $scope.requirements = result.join(', ');
+        }
+    };
 
 
     $scope.historicAssignments = TaskSvc.query({
@@ -233,6 +248,7 @@ function AssigneePickerController($scope, relations, task, assignment, $modalIns
     });
     $scope.historicAssignments.$promise.then(updateLastAssignmentDates);
 
+    $scope.updateRequirements();
 
     $scope.select = function(assignee) {
         $scope.assignee = assignee;
@@ -595,7 +611,7 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
 
         }, function (reason) {
             if (reason === 'deleted') {
-                $scope.calendarObj.fullCalendar('refetchEvents');
+                $scope.$broadcast('event-removed', event);
             }
             $log.info('Modal dismissed at: ' + new Date());
         });
@@ -689,8 +705,8 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
                 $http.get('event-templates/' + eventType + '.json').success(function (event) {
                     event.domain.id = $scope.context.relation.domain.id;
                     event.startTime = startTime;
-
                     EventSvc.save(event).$promise.then(function (event) {
+                        $scope.$broadcast('event-added', event);
                         $scope.open('lg', event);
                     });
                 });
@@ -818,9 +834,30 @@ function EventCalendarDirective(EventSvc, $locale, $filter) {
             
             $scope.$watch('date', function(date) {
                 if(date && $scope.calendarObj) {
-                    $scope.calendarObj.fullCalendar( 'gotoDate', date );
+                    $scope.calendarObj.fullCalendar('gotoDate', date );
                 }
             }, true);
+            
+            $scope.$on('event-added', function(e, event) {
+                $scope.calendarObj.fullCalendar('renderEvent', $scope.toFullCalendarEvent(event));
+            });
+            
+            $scope.$on('event-removed', function(e, event) {
+                $scope.calendarObj.fullCalendar('removeEvents', event.id);
+            });
+            
+            $scope.toFullCalendarEvent = function(event) {
+                return {
+                    id: event.id,
+                    title: $filter('translate')('EVENT_TYPES.' + event.type),
+                    start: new Date(event.startTime.getTime()),
+                    end: new Date(event.endTime.getTime()),
+                    allDay: false,
+                    className: ['field-service-meeting'],
+                    durationEditable: false,
+                    orgEvent: event
+                };
+            };
             
             $scope.eventsF = function (start, end, callback) {
                 $scope.$emit('events-loading');
@@ -838,15 +875,7 @@ function EventCalendarDirective(EventSvc, $locale, $filter) {
                         };
                         var tEvents = [];
                         angular.forEach(events, function (event) {
-                            tEvents.push({
-                                title: $filter('translate')('EVENT_TYPES.' + event.type),
-                                start: new Date(event.startTime.getTime()),
-                                end: new Date(event.endTime.getTime()),
-                                allDay: false,
-                                className: ['field-service-meeting'],
-                                durationEditable: false,
-                                orgEvent: event
-                            });
+                            tEvents.push($scope.toFullCalendarEvent(event));
                         });
                         callback(tEvents);
                         
@@ -1126,11 +1155,11 @@ function TaskEditorDirective($filter, $modal, $log) {
 }
 
 function MetaSuggestionPersonFilter() {
-    return function (input, task, assignment) {
+    return function (input, task, assignment, mode) {
         
         var suggestedSex = assignment.meta['SuggestedSex'], 
                 suggestedRole = assignment.meta['SuggestedRole'], 
-                output = [];
+                output = [], match;
         
         var isSexAccepted = function(relation) {
             return !suggestedSex || suggestedSex === relation.person.sex;
@@ -1161,9 +1190,11 @@ function MetaSuggestionPersonFilter() {
         };
         
         angular.forEach(input, function (relation) {
-            if(isSexAccepted(relation) && 
+            match = isSexAccepted(relation) && 
                     isRoleAccepted(relation) && 
-                    isUsedFor(relation, task, assignment)) {
+                    isUsedFor(relation, task, assignment);
+            if((mode === 'match-only' && match) ||
+                    (mode === 'no-match-only' && !match)) {
                 output.push(relation);
             }
         });

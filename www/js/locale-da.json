@@ -66,7 +66,9 @@
         "ADMIN": "Admin",
         "PROFILE": "Profil",
         "LOG_OUT": "Log ud",
-        "LOCATION": "Lokation"
+        "LOCATION": "Lokation",
+        "MALE": "Mand",
+        "FEMALE": "Kvinde"
     },
     "EVENT_TYPES": {
         "FieldServiceMeeting": "Samling",

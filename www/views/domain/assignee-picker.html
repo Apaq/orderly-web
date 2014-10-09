@@ -1,12 +1,26 @@
 <div class="modal-header">
-    <h4 class="modal-title">{{'ASSIGNMENT_TYPES.' + assignment.type | translate}}</h4>
+    <h4 class="modal-title">{{'ASSIGNMENT_TYPES.' + assignment.type | translate}}<small ng-if="requirements"> ({{requirements}})</small></h4>
 </div>
 <div class="modal-body no-padding">
     <div class="list-group no-margin" style="min-height:300px;max-height:300px">
-        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment | orderBy:['lastAssignmentStartTime', 'person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-group-item" ng-class="{active:relation.person.id===assignee.id}">
+        <span class="list-group-item list-group-item-info">
+            <strong>Foreslået til opgaven</strong>
+        </span>
+        
+        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment:'match-only' | orderBy:['lastAssignmentStartTime', 'person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-group-item" ng-class="{active:relation.person.id===assignee.id}">
           <span class="badge" ng-if="relation.lastAssignmentStartTime">{{relation.lastAssignmentStartTime | date:'shortDate'}}</span>
           {{relation.person.firstName}} {{relation.person.lastName}}
         </a>
+        
+        <span class="list-group-item list-group-item-danger">
+            <strong>Ikke foreslået til opgaven</strong>
+        </span>
+        
+        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment:'no-match-only' | orderBy:['person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-group-item" ng-class="{active:relation.person.id===assignee.id}">
+          <span class="badge" ng-if="relation.lastAssignmentStartTime">{{relation.lastAssignmentStartTime | date:'shortDate'}}</span>
+          {{relation.person.firstName}} {{relation.person.lastName}}
+        </a>
+        
     </div>
 </div>
 <div class="modal-footer">
