@@ -148,3 +148,25 @@ body {
         -webkit-transform: translateX(0);
     }
 }
+
+.list-animate.ng-enter, 
+.list-animate.ng-leave
+{ 
+        -webkit-transition: 100ms ease-in-out all;
+	-moz-transition: 100ms ease-in-out all;
+	-ms-transition: 100ms ease-in-out all;
+	-o-transition: 100ms ease-in-out all;
+	transition: 100ms ease-in-out all;
+	position: relative;
+	
+} 
+
+.list-animate.ng-leave.list-animate.ng-leave-active,
+.list-animate.ng-enter {
+	opacity: 0;
+}
+
+.list-animate.ng-enter.list-animate.ng-enter-active, 
+.list-animate.ng-leave {
+	opacity: 1;
+}

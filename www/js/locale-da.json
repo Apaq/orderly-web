@@ -48,6 +48,15 @@
         }
     },
     "GENERAL": {
+        "WEEKDAYS": {
+            "MONDAY": "Mandag",
+            "TUESDAY": "Tirsdag",
+            "WEDNESDAY": "Onsdag",
+            "THURSDAY": "Torsdag",
+            "FRIDAY": "Fredag",
+            "SATURDAY": "Lørdag",
+            "SUNDAY": "Søndag"
+        },
         "OK": "Ok",
         "CANCEL": "Annullér",
         "DELETE": "Slet",

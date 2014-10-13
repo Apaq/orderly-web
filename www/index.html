@@ -59,8 +59,8 @@
                     </li>
                     <li ng-class="{active:currentArea() === 'persons'}"><a href="#/persons" translate="MENU.PERSONS"></a>
                     </li>
-                    <!--li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')>=0"><a href="#/settings">Indstillinger</a>
-                    </li-->
+                    <li ng-class="{active:currentArea() === 'settings'}" ng-if="context.relation.roles.indexOf('Coordinator')>=0"><a href="#/settings">Indstillinger</a>
+                    </li>
                 </ul>
 
                 <ul class="nav navbar-nav" ng-if="context.mode==='admin'">

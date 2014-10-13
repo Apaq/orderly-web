@@ -1,0 +1,12 @@
+<div class="form-group">
+    <label class="col-md-2 control-label">Ugedag</label>
+    <div class="col-md-2">
+        <select class="form-control" ng-model="meeting.weekDay" ng-options="index as 'GENERAL.WEEKDAYS.'+weekDay|translate for (index,weekDay) in weekDays"></select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label">Tidspunkt</label>
+    <div class="col-md-2">
+        <input type="time" class="form-control" ng-model="meeting.time">
+    </div>
+</div>

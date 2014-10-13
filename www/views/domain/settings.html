@@ -1,0 +1,17 @@
+<div class="container" style="box-shadow: #6f6f6f 0px 0px 4px">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Indstillinger for {{domain.name}}</h1>
+            <form class="form-horizontal">
+                <fieldset>
+                    <legend>Menighedsmøde</legend>
+                    <meeting-form-fields meta="domain.meta" prefix="CongregationMeeting"></meeting-form-fields>
+                    <legend>Offentligt møde</legend>
+                    <meeting-form-fields meta="domain.meta" prefix="PublicMeeting"></meeting-form-fields>
+                    
+                    <button class="btn btn-danger" type="submit" ng-click="save()" ng-disabled="!hasChanged()">Gem</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

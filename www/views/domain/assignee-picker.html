@@ -7,7 +7,7 @@
             <strong>Foreslået til opgaven</strong>
         </span>
         
-        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment:'match-only' | orderBy:['lastAssignmentStartTime', 'person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-group-item" ng-class="{active:relation.person.id===assignee.id}">
+        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment:'match-only' | orderBy:['lastAssignmentStartTime', 'person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-animate list-group-item" ng-class="{active:relation.person.id===assignee.id}">
           <span class="badge" ng-if="relation.lastAssignmentStartTime">{{relation.lastAssignmentStartTime | date:'shortDate'}}</span>
           {{relation.person.firstName}} {{relation.person.lastName}}
         </a>
@@ -16,7 +16,7 @@
             <strong>Ikke foreslået til opgaven</strong>
         </span>
         
-        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment:'no-match-only' | orderBy:['person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-group-item" ng-class="{active:relation.person.id===assignee.id}">
+        <a ng-if="!loading" ng-repeat="relation in relations | metaSuggestions:task:assignment:'no-match-only' | orderBy:['person.firstName', 'person.lastName']" ng-click="select(relation.person)" class="list-animate list-group-item" ng-class="{active:relation.person.id===assignee.id}">
           <span class="badge" ng-if="relation.lastAssignmentStartTime">{{relation.lastAssignmentStartTime | date:'shortDate'}}</span>
           {{relation.person.firstName}} {{relation.person.lastName}}
         </a>

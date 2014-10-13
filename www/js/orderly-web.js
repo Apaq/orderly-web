@@ -29,6 +29,10 @@ function AppConfig($routeProvider, $locationProvider, $httpProvider, orderlyProv
         .when('/persons', {
             templateUrl: 'views/domain/relations.html'
         })
+        .when('/settings', {
+            templateUrl: 'views/domain/settings.html',
+            controller: 'DomainSettingsController'
+        })
         .when('/login', {
             templateUrl: 'views/login.html',
             controller: 'LoginController'
@@ -193,6 +197,23 @@ function AssignmentController($scope, TaskSvc) {
         }
         return null;
     }
+}
+
+function DomainSettingsController($scope, DomainSvc) {
+    $scope.domain = angular.copy($scope.context.relation.domain);
+    $scope.orgDomain = angular.copy($scope.context.relation.domain);
+    
+    $scope.hasChanged = function() {
+        return !angular.equals($scope.domain, $scope.orgDomain);
+    };
+    
+    $scope.save = function() {
+        DomainSvc.save({id:$scope.domain.id}, $scope.domain).$promise.then(function() {
+            $scope.context.relation.domain = $scope.domain;
+            $scope.domain = angular.copy($scope.context.relation.domain);
+            $scope.orgDomain = angular.copy($scope.context.relation.domain);
+        });
+    };
 }
 
 function AssigneePickerController($scope, relations, task, assignment, $modalInstance, TaskSvc, $filter) {
@@ -820,6 +841,42 @@ function PersonFormDirective() {
     };
 }
 
+function MeetingFormFieldsDirective($filter) {
+    return {
+        restrict: 'E',
+        scope: {
+            prefix: '@',
+            meta: '='
+        },
+        link: function(scope, element, attrs) {
+            scope.weekDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+            scope.meeting = {
+                weekDay:"0",
+                time: new Date(1970, 0, 0, 19, 0, 0)
+            };
+
+            if(scope.meta[scope.prefix + 'WeekDay']) {
+                scope.meeting.weekDay = (parseInt(scope.meta[scope.prefix + 'WeekDay']) - 1).toString();
+            }
+
+            if(scope.meta[scope.prefix + 'Time']) {
+                var timeData = scope.meta[scope.prefix + 'Time'].split(':');
+                scope.meeting.time.setHours(timeData[0]);
+                scope.meeting.time.setMinutes(timeData[1]);
+            }
+
+            scope.$watch('meeting.weekDay', function() {
+                scope.meta[scope.prefix + 'WeekDay'] = (parseInt(scope.meeting.weekDay)+1).toString();
+            });
+
+            scope.$watch('meeting.time', function() {
+                scope.meta[scope.prefix + 'Time'] = $filter('date')(scope.meeting.time, 'HH:mm');
+            });
+        },
+        templateUrl: 'views/directives/meeting-form-fields.html'
+    };
+}
+
 function EventCalendarDirective(EventSvc, $locale, $filter) {
     return {
         restrict: 'E',
@@ -1265,6 +1322,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .controller('AssignmentController', AssignmentController)
     .controller('MenuController', MenuController)
     .controller('CalendarController', CalendarController)
+    .controller('DomainSettingsController', DomainSettingsController)
     .controller('AdminDomainListController', AdminDomainListController)
     .controller('AdminPersonListController', AdminPersonListController)
     .directive('relationList', RelationListDirective)
@@ -1272,6 +1330,7 @@ angular.module('orderly.web', ['ngRoute', 'ngAnimate', 'orderly.services', 'ui.c
     .directive('taskEditor', TaskEditorDirective)
     .directive('eventTable', EventTableDirective)
     .directive('eventCalendar', EventCalendarDirective)
+    .directive('meetingFormFields', MeetingFormFieldsDirective)
     .filter('metaSuggestions', MetaSuggestionPersonFilter)
     .factory({
         'LoadingIndicatorSvc': LoadingIndicatorSvc
