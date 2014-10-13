@@ -11,9 +11,35 @@
     <div class="row">
         <div class="col-sm-12">
             {{'EVENT.TEMPLATE_PICKER.CHOOSE_EVENT' | translate}}:
-            <div class="radio" ng-repeat="type in ['FieldServiceMeeting', 'PublicWitnessing', 'Study_School_Service_Meeting', 'PublicTalk_WatchtowerStudy_Meeting']">
+            <div class="radio">
                 <label>
-                    <input type="radio" ng-model="data.eventType" value="{{type}}">{{'EVENT_TYPES.' + type | translate}}
+                    <input type="radio" ng-model="data.eventType" value="FieldServiceMeeting">{{'EVENT_TYPES.FieldServiceMeeting' | translate}}
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" ng-model="data.eventType" value="PublicWitnessing">{{'EVENT_TYPES.PublicWitnessing' | translate}}
+                </label>
+            </div>
+            <div class="form-inline">
+                <div class="form-group">
+                    <input type="number" class="form-control input-sm" ng-model="publicWitnessing.stands" style="width:50px" ng-disabled="data.eventType!=='PublicWitnessing'">
+                    <label> stande á </label>
+                    <input type="number" class="form-control input-sm" ng-model="publicWitnessing.shifts" style="width:50px" ng-disabled="data.eventType!=='PublicWitnessing'">
+                    <label> skift á </label>
+                    <input type="number" class="form-control input-sm" ng-model="publicWitnessing.shiftDuration" style="width:50px" ng-disabled="data.eventType!=='PublicWitnessing'">
+                    <label> minutter ved </label>
+                    <input type="text" class="form-control input-sm" ng-model="publicWitnessing.location" style="width:150px" placeholder="Lokation" ng-disabled="data.eventType!=='PublicWitnessing'">
+                </div>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" ng-model="data.eventType" value="CongregationMeeting">{{'EVENT_TYPES.CongregationMeeting' | translate}}
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" ng-model="data.eventType" value="PublicMeeting">{{'EVENT_TYPES.PublicMeeting' | translate}}
                 </label>
             </div>
 

@@ -4,7 +4,7 @@
     },
     "startTime": null,
     "endTime": null,
-    "type": "CongregationMeeting",
+    "type": "PublicMeeting",
     "agendas": [
         {
             "title": "Møde",

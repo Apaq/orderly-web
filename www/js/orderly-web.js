@@ -708,9 +708,20 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
                     $scope.data = {
                         eventType: 'FieldServiceMeeting'
                     };
+                    
+                    $scope.publicWitnessing = {
+                        stands: 1,
+                        shifts: 5,
+                        shiftDuration: 60,
+                        location: ''
+                    };
 
                     $scope.ok = function () {
-                        $modalInstance.close($scope.data.eventType);
+                        var tag;
+                        if($scope.data.eventType === 'PublicWitnessing') {
+                            tag = $scope.publicWitnessing;
+                        }
+                        $modalInstance.close({eventType:$scope.data.eventType, tag:tag});
                     };
 
                     $scope.cancel = function () {
@@ -719,18 +730,52 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
                 }
             });
 
-            modalInstance.result.then(function (eventType) {
-                var startTime = new Date(date.getTime());
+            modalInstance.result.then(function (result) {
+                var startTime = new Date(date.getTime()), event, i, e;
                 startTime.setHours(10);
 
-                $http.get('event-templates/' + eventType + '.json').success(function (event) {
+                var saveNewEvent = function(event) {
                     event.domain.id = $scope.context.relation.domain.id;
                     event.startTime = startTime;
                     EventSvc.save(event).$promise.then(function (event) {
                         $scope.$broadcast('event-added', event);
                         $scope.open('lg', event);
                     });
-                });
+                }
+                
+                if(result.eventType === 'PublicWitnessing') {
+                    event = {
+                        domain:{},
+                        startTime: null,
+                        endTime: null,
+                        type: "PublicWitnessing",
+                        agendas: []
+                    }
+                    
+                    for(i=0;i<result.tag.stands;i++) {
+                        event.agendas[i] = {tasks:[]};
+                        for(e=0;e<result.tag.shifts;e++) {
+                            event.agendas[i].tasks.push({
+                                type: "Witnessing",
+                                duration: result.tag.shiftDuration,
+                                meta: {Location:result.tag.location},
+                                assignments: [
+                                    {
+                                        "type": "Publisher"
+                                    },
+                                    {
+                                        "type": "Publisher"
+                                    }
+                                ]
+                            });
+                        }
+                    }
+                    saveNewEvent(event);
+                } else {
+                    $http.get('event-templates/' + result.eventType + '.json').success(function (event) {
+                        saveNewEvent(event);
+                    });
+                }
 
             });
 
@@ -1017,7 +1062,7 @@ function EventCalendarDirective(EventSvc, $locale, $filter) {
     };
 }
 
-function EventTableDirective(RelationSvc, EventSvc, $modal, $log) {
+function EventTableDirective(RelationSvc, EventSvc, $modal, $log, $window) {
     return {
         restrict: 'E',
         scope: {
@@ -1148,6 +1193,21 @@ function EventTableDirective(RelationSvc, EventSvc, $modal, $log) {
                     title += ": " + task.meta.Curriculum;
                 }
                 return title;
+            };
+            
+            scope.setLocation = function(task) {
+                var location = task.meta.Location;
+                if(!location) {
+                    location = '';
+                }
+                
+                location = $window.prompt("Indtast lokation:", location);
+                if(location === '') {
+                    delete task.meta.Location;
+                } else {
+                    task.meta.Location = location;
+                }
+                
             };
             
             scope.selectAssignee = function (task, assignment) {

@@ -25,8 +25,8 @@
                     </span>
 
                     <span ng-if="agenda.tasks[n].type === 'Witnessing'" ng-click="enterLocation(agenda.tasks[n])" class="label" ng-class="{'label-info':agenda.tasks[n].meta.Location.length > 0,'label-default':!(agenda.tasks[n].meta.Location.length > 0)}" style="margin-left:4px">
-                        <span ng-if="agenda.tasks[n].meta.Location.length > 0">{{agenda.tasks[n].meta.Location}}</span>
-                        <span ng-if="!(agenda.tasks[n].meta.Location.length > 0)">{{'GENERAL.LOCATION'| translate}}</span>
+                        <span ng-if="agenda.tasks[n].meta.Location.length > 0" ng-click="setLocation(agenda.tasks[n])">{{agenda.tasks[n].meta.Location}}</span>
+                        <span ng-if="!(agenda.tasks[n].meta.Location.length > 0)" ng-click="setLocation(agenda.tasks[n])">{{'GENERAL.LOCATION'| translate}}</span>
                     </span>
 
                     <span ng-repeat="assignment in agenda.tasks[n].assignments" ng-click="selectAssignee(agenda.tasks[n], assignment)" class="label" ng-class="{'label-success':assignment.assignee,'label-danger':!assignment.assignee}" style="margin-left:4px" title="{{'ASSIGNMENT_TYPES.' + assignment.type| translate}}">

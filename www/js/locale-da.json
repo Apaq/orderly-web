@@ -81,10 +81,9 @@
     },
     "EVENT_TYPES": {
         "FieldServiceMeeting": "Samling",
-        "CongregationMeeting": "Møde",
-        "PublicWitnessing": "Offentlig forkyndelse",
-        "Study_School_Service_Meeting": "Studie, Teokratisk Skole og Tjenestemøde",
-        "PublicTalk_WatchtowerStudy_Meeting": "Offentligt foredrag og Vagttårnsstudie"
+        "CongregationMeeting": "Menighedsmøde (Studie, Teokratisk Skole og Tjenestemøde)",
+        "PublicMeeting": "Offentligt møde (Offentligt foredrag og Vagttårnsstudie)",
+        "PublicWitnessing": "Offentlig forkyndelse"
     },
     "TASK_TYPES": {
         "FieldServiceMeeting": "Samling",
