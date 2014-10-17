@@ -500,7 +500,7 @@ function EventController($scope, EventSvc, $log, $location, event, $window, Pers
     $scope.readonly = readonly;
     $scope.edit = {};
     $scope.selection = {};
-
+    
     $scope.selectTask = function (task) {
         $scope.selection.task = task;
     };
@@ -615,7 +615,7 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
             size: size,
             resolve: {
                 event: function () {
-                    return angular.copy(event);
+                    return EventSvc.get({id:event.id, mode:'full'}).$promise;//angular.copy(event);
                 },
                 readonly: function () {
                     return readonly === true;
@@ -735,7 +735,7 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
                 startTime.setHours(10);
 
                 var saveNewEvent = function(event) {
-                    event.domain.id = $scope.context.relation.domain.id;
+                    event.domainId = $scope.context.relation.domain.id;
                     event.startTime = startTime;
                     EventSvc.save(event).$promise.then(function (event) {
                         $scope.$broadcast('event-added', event);
@@ -972,8 +972,7 @@ function EventCalendarDirective(EventSvc, $locale, $filter) {
                     EventSvc.query({
                         domain: $scope.domain.id,
                         from: start,
-                        to: end,
-                        mode: 'full'
+                        to: end
                     }).$promise.then(function (events) {
                         $scope.currentEvents = events;
                         $scope.currentRange = {
@@ -1017,7 +1016,7 @@ function EventCalendarDirective(EventSvc, $locale, $filter) {
 
             $scope._renderEvent = function (event, element, view) {
                 event = event.orgEvent;
-                var singleAgenda = event.agendas.length === 1;
+                var singleAgenda = false; //event.agendas.length === 1;
                 var singleTask = singleAgenda && event.agendas[0].tasks.length === 1;
                 var singleAssignment = singleTask && event.agendas[0].tasks[0].assignments.length === 1;
 
@@ -1070,11 +1069,12 @@ function EventTableDirective(RelationSvc, EventSvc, $modal, $log, $window) {
         },
         link: function (scope, element, attrs) {
             scope.relations = RelationSvc.query({
-                domain: scope.event.domain.id
+                domain: scope.event.domainId
             });
             
             scope.time = angular.copy(scope.event.startTime);
-            
+            scope.repeat = angular.isDefined(scope.event.recurrenceRule) && scope.event.recurrenceRule !== null;
+
             scope.$watch(function () {
                 var time = scope.time ? scope.time.getTime() : -1;
                 return time;
@@ -1087,6 +1087,10 @@ function EventTableDirective(RelationSvc, EventSvc, $modal, $log, $window) {
             });
             
             scope.$watch('event.startTime', scope.updateTaskStartTimes);
+            
+            scope.$watch('repeat', function() {
+               scope.event.recurrenceRule = scope.repeat ? 'FREQ=WEEKLY;BYDAY=MO,WE' : null;
+            });
             
             scope.songs = [];
             for (i = 1; i <= 135; i++) {

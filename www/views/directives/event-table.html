@@ -5,6 +5,7 @@
                 <input type="time" class="form-control input-sm" ng-model="time">
                 <label>{{'EVENT_TYPES.' + event.type| translate}} <span ng-if="!isEventComplete(event)" class="glyphicon glyphicon-warning-sign" style="color:red" title="Denne begivenhed er ikke færdiggjort"></span></label>
             </div>
+            <input type="checkbox" ng-model="repeat"> Gentag {{repeat}}
         </form>
 
      </div>
