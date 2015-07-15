@@ -745,7 +745,7 @@ function CalendarController($scope, EventSvc, $log, $filter, $modal, LoadingIndi
                 
                 if(result.eventType === 'PublicWitnessing') {
                     event = {
-                        domain:{},
+                        domainId: null,
                         startTime: null,
                         endTime: null,
                         type: "PublicWitnessing",

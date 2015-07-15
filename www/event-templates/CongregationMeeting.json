@@ -1,8 +1,6 @@
 
 {
-    "domain": {
-        "id": null
-    },
+    "domainId": null,
     "startTime": null,
     "endTime": null,
     "type": "CongregationMeeting",

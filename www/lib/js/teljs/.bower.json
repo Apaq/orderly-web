@@ -1,0 +1,28 @@
+{
+  "name": "teljs",
+  "devDependencies": {
+    "angular": "1.2.16",
+    "angular-mocks": "1.2.16"
+  },
+  "ignore": [
+    ".bowerrc",
+    ".gitignore",
+    ".travis.yml",
+    "bower_components/**",
+    "init_repo.sh",
+    "karma.conf.js",
+    "test/**"
+  ],
+  "main": "src/tel.js",
+  "homepage": "https://github.com/michaelkrog/tel.js",
+  "version": "1.0.4",
+  "_release": "1.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.4",
+    "commit": "2d94bc2fa377938865ae42be4c0e963033da876c"
+  },
+  "_source": "git://github.com/michaelkrog/tel.js.git",
+  "_target": "*",
+  "_originalSource": "teljs"
+}
